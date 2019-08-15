@@ -2,8 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QDialog>
-#include <QLayout>
+#include "calibratedialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -19,11 +18,18 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QDialog *calibrateDialog;
-    QLayout *calibrateDialogLayout;
+    CalibrateDialog *calDialog;
 
 public:
     void showClibrateDialog();
+    void connectHsRobotBnt();
+    void enanleHsRobotBnt();
+    void loadHSRobotPrgBnt();
+    void HsRobotStartBnt();
+    void HsrRobotStopBnt();
+    void OpenOrCloseMicrophoneBnt();
+    void OpenOrCloseVoiceRecognitionBnt();
+    void StartPrizeClawBnt();
 };
 
 #endif // MAINWINDOW_H

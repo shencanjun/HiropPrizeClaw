@@ -16,12 +16,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::showClibrateDialog()
 {
-   // calibrateDialogLayout = new QLayout();
-    calibrateDialog = new QDialog();
-    calibrateDialog->resize(50,100);
-    QPushButton *calibrateBtn = new QPushButton("标定",calibrateDialog);
-    QLabel *
+    calDialog = new CalibrateDialog();
+    calDialog->setWindowTitle("标定");
+    calDialog->show();
+}
 
-    calibrateDialog->show();
+void MainWindow::connectHsRobotBnt()
+{
+
 }
 

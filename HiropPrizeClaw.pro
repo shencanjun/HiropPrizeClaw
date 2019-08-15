@@ -13,8 +13,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    calibratedialog.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    calibratedialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    calibratedialog.ui
