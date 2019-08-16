@@ -42,7 +42,7 @@ bool HSC3ROBOT::getHscEnanle(bool &en)
     return ret == 0 ? true : false;
 }
 
-bool HSC3ROBOT::HscLoadPRG(std::string path = "./script",std::string progname)
+bool HSC3ROBOT::HscLoadPRG(std::string progname,std::string path)
 {
     ret = proVm->load(path,progname);
     return ret == 0 ? true : false;
@@ -80,21 +80,28 @@ bool HSC3ROBOT::getHscR(int index, double &value)
     return ret == 0 ? true : false;
 }
 
-bool HSC3ROBOT::setHscLR(int index, LocPos pos)
+bool HSC3ROBOT::setHscLR(int index, LocData pos)
 {
-    ret = proVar->setLR(gpId,index,pos);
+    LocPos locpos;
+    locpos.ufNum = -1;
+    locpos.utNum = -1;
+    proMotion->getConfig(gpId,locpos.config);
+    locpos.vecPos = pos;
+    ret = proVar->setLR(gpId,index,locpos);
     return ret == 0 ? true : false;
 }
 
-bool HSC3ROBOT::getHscLR(int index, LocPos& pos)
+bool HSC3ROBOT::getHscLR(int index, LocData& pos)
 {
-    ret = proVar->getLR(gpId,index,pos);
+    LocPos locpos;
+    ret = proVar->getLR(gpId,index,locpos);
+    pos = locpos.vecPos;
     return ret == 0 ? true : false;
 }
 
 bool HSC3ROBOT::getHscLoc(LocData &posData)
 {
-    ret = proMotion->getLocData(goId,posData);
+    ret = proMotion->getLocData(gpId,posData);
     return ret == 0 ? true : false;
 }
 

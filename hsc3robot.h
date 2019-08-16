@@ -9,8 +9,6 @@
 #include "3rdparty/include/proxy/ProxySys.h"
 #include "3rdparty/include/proxy/ProxyVm.h"
 
-#define int8_t gpId 0;
-
 using namespace Hsc3::Comm;
 using namespace Hsc3::Proxy;
 
@@ -29,9 +27,9 @@ public:
 
     bool getHscEnanle(bool& en);
 
-    bool HscLoadPRG(std::string path = "./script",std::string progname);
+    bool HscLoadPRG(std::string progname,std::string path = "./script");
 
-    bool HscUnloadPRG(std::string path = "./script",std::string progname);
+    bool HscUnloadPRG(std::string progname);
 
     bool HscPrgStart();
 
@@ -61,7 +59,7 @@ protected:
 
     LocData LocPosData;
 
-
+    const int8_t gpId = 0;
 };
 
 #endif // HSC3ROBOT_H
