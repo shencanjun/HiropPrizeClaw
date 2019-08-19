@@ -8,6 +8,7 @@
 #include "3rdparty/include/proxy/ProxyVar.h"
 #include "3rdparty/include/proxy/ProxySys.h"
 #include "3rdparty/include/proxy/ProxyVm.h"
+#include <QException>
 
 using namespace Hsc3::Comm;
 using namespace Hsc3::Proxy;

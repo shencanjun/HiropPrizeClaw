@@ -22,9 +22,10 @@ private:
     Ui::MainWindow *ui;
     CalibrateDialog *calDialog;
     VoiceRecognite *voice;
-    HSC3ROBOT *hsc3;
-
     ros::NodeHandle n_MW;
+
+public:
+    HSC3ROBOT *hsc3;
 
 public:
     void setReturnStrtoUI(QString str);
@@ -48,6 +49,8 @@ public:
     void StartPrizeClawBnt();
 
     void showVoiceRecognitionResult(QString str);
+
+    void setResultHsrLR();
 };
 
 #endif // MAINWINDOW_H

@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButton_Load,&QPushButton::clicked,this,&MainWindow::loadHSRobotPrgBnt);
     connect(ui->pushButton_start,&QPushButton::clicked,this,&MainWindow::HsRobotStartBnt);
     connect(voice,&VoiceRecognite::emitResultStr,this,&MainWindow::showVoiceRecognitionResult);
+    connect(ui->pushButton_result_set,&QPushButton::clicked,this,&MainWindow::setResultHsrLR);
     initRobot();
 }
 
@@ -40,6 +41,7 @@ void MainWindow::showClibrateDialog()
 {
     calDialog = new CalibrateDialog();
     calDialog->setWindowTitle("标定");
+    calDialog->setHsc3Object(hsc3);
     calDialog->show();
 }
 
@@ -62,7 +64,8 @@ void MainWindow::OpenOrCloseVoiceRecognitionBnt()
 
 void MainWindow::showVoiceRecognitionResult(QString str)
 {
-    setReturnStrtoUI("抓取:"+str);
+    //QString pstr = ""+str;
+    setReturnStrtoUI("抓取：<font color = blue size = 10>"+str+"</font>" );
     return;
 }
 
@@ -210,5 +213,37 @@ void MainWindow::HsRobotStartBnt()
         }
     }
     return;
+}
+
+void MainWindow::setResultHsrLR()
+{
+    int index = 100;
+
+    double lrX = ui->lineEdit_result_X->text().toDouble();
+    double lrY = ui->lineEdit_result_Y->text().toDouble();
+    double lrZ = ui->lineEdit_result_Z->text().toDouble();
+    double lrA = ui->lineEdit_result_A->text().toDouble();
+    double lrB = ui->lineEdit_result_B->text().toDouble();
+    double lrC = ui->lineEdit_result_C->text().toDouble();
+
+    LocData locdata;
+    locdata.push_back(lrX);
+    locdata.push_back(lrY);
+    locdata.push_back(lrZ);
+    locdata.push_back(lrA);
+    locdata.push_back(lrB);
+    locdata.push_back(lrC);
+
+    if(hsc3->setHscLR(index, locdata))
+    {
+        setReturnStrtoUI("<font color = green> 设置机器人LR成功！！！ </font>");
+    }
+    else
+    {
+        setReturnStrtoUI("<font color = red> 设置机器人LR失败！！！ </font>");
+    }
+
+    return;
+
 }
 
