@@ -38,7 +38,7 @@ void CalibrateDialog::RecordCalibrateData()
     hscLocData = data;
 
     ui->tableWidget->setItem(raw, rColumnX, new QTableWidgetItem(QString::number(data[0],'f',4)));
-    ui->tableWidget->setItem(raw, rColumnY, new QTableWidgetItem(QString::number(data[2],'f',4)));
+    ui->tableWidget->setItem(raw, rColumnY, new QTableWidgetItem(QString::number(data[1],'f',4)));
 
     raw++;
 

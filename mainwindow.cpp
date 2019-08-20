@@ -18,7 +18,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(voice,&VoiceRecognite::emitResultStr,this,&MainWindow::showVoiceRecognitionResult);
     connect(ui->pushButton_result_set,&QPushButton::clicked,this,&MainWindow::setResultHsrLR);
     connect(getLocTimer, &QTimer::timeout, this, &MainWindow::showHsrLocOnTime);
-    initRobot();
 }
 
 MainWindow::~MainWindow()
@@ -90,7 +89,7 @@ void MainWindow::initRobot()
 void MainWindow::connectHsRobotBnt()
 {
     std::string ipstr = ui->lineEdit_rip->text().toStdString();
-    int8_t port = ui->lineEdit_rport->text().toInt();
+    uint16_t port = ui->lineEdit_rport->text().toShort();
 
     if(ui->pushButton_connectRobot->text() == "连接")
     {
@@ -99,12 +98,15 @@ void MainWindow::connectHsRobotBnt()
             ui->pushButton_connectRobot->setText("断开");
             ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(85, 255, 127)");
             ui->lineEdit_rip->setReadOnly(true);
-            getLocTimer->start();
+            ui->lineEdit_rport->setReadOnly(true);
+            getLocTimer->start(1.0);
+            initRobot();
             setReturnStrtoUI("连接机器人成功！！！");
          }
          else
          {
             ui->lineEdit_rip->setReadOnly(false);
+            ui->lineEdit_rport->setReadOnly(false);
             setReturnStrtoUI("<font color = red> 连接机器人失败！！！ </font>");
          }
     }
@@ -113,15 +115,16 @@ void MainWindow::connectHsRobotBnt()
         if(hsc3->disconnectIPC())
         {
             ui->lineEdit_rip->setReadOnly(false);
+            ui->lineEdit_rport->setReadOnly(false);
             ui->pushButton_connectRobot->setText("连接");
             ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(２55, 255, 255)");
             getLocTimer->stop();
             setReturnStrtoUI("断开连接机器人成功！！！");
-            ui->lineEdit_rip->setReadOnly(false);
         }
         else
         {
            ui->lineEdit_rip->setReadOnly(true);
+           ui->lineEdit_rport->setReadOnly(true);
            setReturnStrtoUI("<font color = red> 断开连接机器人失败！！！ </font>");
         }
     }
@@ -145,7 +148,7 @@ void MainWindow::enanleHsRobotBnt()
     else
     {
         ui->pushButton_ebnable->setText("失能");
-        if(hsc3->setHscEnanle(true)){
+        if(hsc3->setHscEnanle(false)){
             ui->pushButton_ebnable->setStyleSheet("background-color: rgb(255, 255, 255)");
             ui->pushButton_ebnable->setText("使能");
             setReturnStrtoUI("机器人失能成功！！！");
@@ -260,13 +263,14 @@ void MainWindow::showHsrLocOnTime()
         return;
     }
     if(locdata.size() < 6)
+        return;
 
-    ui->label_X->setText(QString::number(locdata[0],'f',4));
-    ui->label_Y->setText(QString::number(locdata[1],'f',4));
-    ui->label_Z->setText(QString::number(locdata[2],'f',4));
-    ui->label_A->setText(QString::number(locdata[3],'f',4));
-    ui->label_B->setText(QString::number(locdata[4],'f',4));
-    ui->label_C->setText(QString::number(locdata[5],'f',4));
+    ui->label_X->setText(QString::number(locdata[0], 'f', 4));
+    ui->label_Y->setText(QString::number(locdata[1], 'f', 4));
+    ui->label_Z->setText(QString::number(locdata[2], 'f', 4));
+    ui->label_A->setText(QString::number(locdata[3], 'f', 4));
+    ui->label_B->setText(QString::number(locdata[4], 'f', 4));
+    ui->label_C->setText(QString::number(locdata[5], 'f', 4));
 
     return;
 
