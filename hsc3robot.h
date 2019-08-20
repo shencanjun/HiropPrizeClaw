@@ -1,6 +1,10 @@
 #ifndef HSC3ROBOT_H
 #define HSC3ROBOT_H
 
+#include <QException>
+#include <iostream>
+#include <stdlib.h>
+#include <stdio.h>
 #include "3rdparty/include/CommApi.h"
 #include "3rdparty/include/Hsc3Def.h"
 #include "3rdparty/include/ErrDef.h"
@@ -8,7 +12,7 @@
 #include "3rdparty/include/proxy/ProxyVar.h"
 #include "3rdparty/include/proxy/ProxySys.h"
 #include "3rdparty/include/proxy/ProxyVm.h"
-#include <QException>
+
 
 using namespace Hsc3::Comm;
 using namespace Hsc3::Proxy;
