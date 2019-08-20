@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTimer>
 #include "calibratedialog.h"
 #include "voicerecognite.h"
 #include "hsc3robot.h"
@@ -23,6 +24,7 @@ private:
     CalibrateDialog *calDialog;
     VoiceRecognite *voice;
     ros::NodeHandle n_MW;
+    QTimer *getLocTimer;
 
 public:
     HSC3ROBOT *hsc3;
@@ -51,6 +53,8 @@ public:
     void showVoiceRecognitionResult(QString str);
 
     void setResultHsrLR();
+
+    void showHsrLocOnTime();
 };
 
 #endif // MAINWINDOW_H

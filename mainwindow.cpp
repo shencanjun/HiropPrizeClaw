@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     voice = new VoiceRecognite(n_MW);
     hsc3 = new HSC3ROBOT();
+    getLocTimer = new QTimer(this);
     connect(ui->actionCalibrate,&QAction::triggered,this,&MainWindow::showClibrateDialog);
     connect(ui->pushButton_VoiceRecognition,&QPushButton::clicked,this,&MainWindow::OpenOrCloseVoiceRecognitionBnt);
     connect(ui->pushButton_connectRobot,&QPushButton::clicked,this,&MainWindow::connectHsRobotBnt);
@@ -16,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButton_start,&QPushButton::clicked,this,&MainWindow::HsRobotStartBnt);
     connect(voice,&VoiceRecognite::emitResultStr,this,&MainWindow::showVoiceRecognitionResult);
     connect(ui->pushButton_result_set,&QPushButton::clicked,this,&MainWindow::setResultHsrLR);
+    connect(getLocTimer, &QTimer::timeout, this, &MainWindow::showHsrLocOnTime);
     initRobot();
 }
 
@@ -97,6 +99,7 @@ void MainWindow::connectHsRobotBnt()
             ui->pushButton_connectRobot->setText("断开");
             ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(85, 255, 127)");
             ui->lineEdit_rip->setReadOnly(true);
+            getLocTimer->start();
             setReturnStrtoUI("连接机器人成功！！！");
          }
          else
@@ -110,10 +113,11 @@ void MainWindow::connectHsRobotBnt()
         if(hsc3->disconnectIPC())
         {
             ui->lineEdit_rip->setReadOnly(false);
-           ui->pushButton_connectRobot->setText("连接");
-           ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(２55, 255, 255)");
-           setReturnStrtoUI("断开连接机器人成功！！！");
-           ui->lineEdit_rip->setReadOnly(false);
+            ui->pushButton_connectRobot->setText("连接");
+            ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(２55, 255, 255)");
+            getLocTimer->stop();
+            setReturnStrtoUI("断开连接机器人成功！！！");
+            ui->lineEdit_rip->setReadOnly(false);
         }
         else
         {
@@ -226,13 +230,13 @@ void MainWindow::setResultHsrLR()
     double lrB = ui->lineEdit_result_B->text().toDouble();
     double lrC = ui->lineEdit_result_C->text().toDouble();
 
+    double lrArry[9] = {lrX, lrY, lrZ, lrA, lrB, lrC, 0, 0, 0};
+
     LocData locdata;
-    locdata.push_back(lrX);
-    locdata.push_back(lrY);
-    locdata.push_back(lrZ);
-    locdata.push_back(lrA);
-    locdata.push_back(lrB);
-    locdata.push_back(lrC);
+    for(int i = 0; i < 9; i++)
+    {
+        locdata.push_back(lrArry[i]);
+    }
 
     if(hsc3->setHscLR(index, locdata))
     {
@@ -242,6 +246,27 @@ void MainWindow::setResultHsrLR()
     {
         setReturnStrtoUI("<font color = red> 设置机器人LR失败！！！ </font>");
     }
+
+    return;
+}
+
+void MainWindow::showHsrLocOnTime()
+{
+    LocData locdata;
+
+    if(!hsc3->getHscLoc(locdata))
+    {
+        setReturnStrtoUI("<font color = red> 获取机器人笛卡尔坐标失败！！！ </font>");
+        return;
+    }
+    if(locdata.size() < 6)
+
+    ui->label_X->setText(QString::number(locdata[0],'f',4));
+    ui->label_Y->setText(QString::number(locdata[1],'f',4));
+    ui->label_Z->setText(QString::number(locdata[2],'f',4));
+    ui->label_A->setText(QString::number(locdata[3],'f',4));
+    ui->label_B->setText(QString::number(locdata[4],'f',4));
+    ui->label_C->setText(QString::number(locdata[5],'f',4));
 
     return;
 

@@ -23,7 +23,7 @@
       <item row="0" column="0">
        <layout class="QGridLayout" name="gridLayout" columnstretch="7,3">
         <item row="0" column="0">
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="label_show_image">
           <property name="styleSheet">
            <string notr="true">background-color: rgb(0, 255, 255);</string>
           </property>
