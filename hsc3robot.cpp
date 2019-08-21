@@ -39,6 +39,7 @@ bool HSC3ROBOT::disconnectIPC()
 bool HSC3ROBOT::setHscEnanle(bool en)
 {
     ret = proMotion->setGpEn(gpId,en);
+    std::cout<<"ret = "<<ret << std::endl;
     return ret == 0 ? true : false;
 }
 
@@ -60,16 +61,14 @@ bool HSC3ROBOT::HscUnloadPRG(std::string progname)
     return ret == 0 ? true : false;
 }
 
-bool HSC3ROBOT::HscPrgStart()
-{
-    std::string progname;
+bool HSC3ROBOT::HscPrgStart(std::string progname)
+{    
     ret = proVm->start(progname);
     return ret == 0 ? true : false;
 }
 
-bool HSC3ROBOT::HscPrgStop()
+bool HSC3ROBOT::HscPrgStop(std::string progname)
 {
-    std::string progname;
     ret = proVm->stop(progname);
     return ret == 0 ? true : false;
 }

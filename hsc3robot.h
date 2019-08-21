@@ -36,9 +36,9 @@ public:
 
     bool HscUnloadPRG(std::string progname);
 
-    bool HscPrgStart();
+    bool HscPrgStart(std::string progname);
 
-    bool HscPrgStop();
+    bool HscPrgStop(std::string progname);
 
     bool setHscR(int index, double value);
 

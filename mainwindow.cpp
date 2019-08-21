@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    progName = "HIROP.PRG";
     calDialog = new CalibrateDialog();
     calDialog->setWindowTitle("标定");
     voice = new VoiceRecognite(n_MW);
@@ -163,10 +164,10 @@ void MainWindow::enanleHsRobotBnt()
 
 void MainWindow::loadHSRobotPrgBnt()
 {
-    std::string progname = "HIROP.PRG";
+    //std::string progname = "HIROP.PRG";
     if(ui->pushButton_Load->text() == "加载")
     {
-        if(hsc3->HscLoadPRG(progname))
+        if(hsc3->HscLoadPRG(progName))
         {
             ui->pushButton_Load->setText("卸载");
             ui->pushButton_Load->setStyleSheet("background-color: rgb(85, 255, 127)");
@@ -179,7 +180,7 @@ void MainWindow::loadHSRobotPrgBnt()
     }
     else
     {
-        if(hsc3->HscUnloadPRG(progname))
+        if(hsc3->HscUnloadPRG(progName))
         {
             ui->pushButton_Load->setText("加载");
             ui->pushButton_Load->setStyleSheet("background-color: rgb(255, 255, 255)");
@@ -197,7 +198,7 @@ void MainWindow::HsRobotStartBnt()
 {
     if(ui->pushButton_start->text() == "开始" )
     {
-        if(hsc3->HscPrgStart()){
+        if(hsc3->HscPrgStart(progName)){
             ui->pushButton_start->setText("停止");
             ui->pushButton_start->setStyleSheet("background-color: rgb(85, 255, 127)");
             setReturnStrtoUI("<font color = green> 开始运行机器人程序成功！！！</font>");
@@ -209,9 +210,9 @@ void MainWindow::HsRobotStartBnt()
     }
     else
     {
-        if(hsc3->HscPrgStop()){
-            ui->pushButton_start->setText("停止");
-            ui->pushButton_start->setStyleSheet("background-color: rgb(85, 255, 127)");
+        if(hsc3->HscPrgStop(progName)){
+            ui->pushButton_start->setText("开始");
+            ui->pushButton_start->setStyleSheet("background-color: rgb(255, 255, 255)");
             setReturnStrtoUI("<font color = green> 停止运行机器人程序成功！！！</font>");
         }
         else

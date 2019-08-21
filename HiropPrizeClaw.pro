@@ -32,10 +32,11 @@ FORMS    += mainwindow.ui \
     calibratedialog.ui
 
 INCLUDEPATH += ./ \
-               /home/ros/catkin_ws/devel/include \
+               /home/fshs/catkin_ws/devel/include \
                /opt/ros/kinetic/include \
                3rdparty/include
 
 LIBS+= -L/opt/ros/kinetic/lib -lroscpp -lroscpp_serialization -lroslib -lrosconsole
 LIBS+= -L/usr/local/lib -ljsoncpp -lboost_system
-LIBS+= -L/home/ros/HiropPrizeClaw/HiropPrizeClaw/3rdparty/lib/HsApi -lCommApi -lHsc3Api -lLogApi
+#LIBS+= -L/home/ros/HiropPrizeClaw/HiropPrizeClaw/3rdparty/lib/HsApi -lCommApi -lHsc3Api -lLogApi
+LIBS+= -L/home/fshs/work/HiropPrizeClaw/3rdparty/lib/HsApi -lCommApi -lHsc3Api -lLogApi

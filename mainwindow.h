@@ -25,6 +25,7 @@ private:
     VoiceRecognite *voice;
     ros::NodeHandle n_MW;
     QTimer *getLocTimer;
+    std::string progName;
 
 public:
     HSC3ROBOT *hsc3;
