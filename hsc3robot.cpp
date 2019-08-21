@@ -3,7 +3,9 @@
 HSC3ROBOT::HSC3ROBOT()
 {
     comapi = new CommApi();
+    //关闭自动重连功能，否则连接失败
     comapi->setAutoConn(false);
+
     proMotion = new ProxyMotion(comapi);
     proSys = new ProxySys(comapi);
     proVar = new ProxyVar(comapi);
@@ -22,7 +24,7 @@ HSC3ROBOT::~HSC3ROBOT()
 bool HSC3ROBOT::connectIPC(std::string IPstr, uint16_t port)
 {
     std::cout<<"IPstr = " << IPstr
-              <<",port = " << port <<std::endl;
+             <<",port = " << port <<std::endl;
     ret = comapi->connect(IPstr, port);
     std::cout<<"ret = " << ret <<std::endl;
     return ret == 0 ? true : false;
