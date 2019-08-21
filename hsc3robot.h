@@ -40,6 +40,10 @@ public:
 
     bool HscPrgStop(std::string progname);
 
+    bool HscClearFault();
+
+    bool getFaultMessage(ErrLevel &level, std::string &msg);
+
     bool setHscR(int index, double value);
 
     bool getHscR(int index, double& value);
@@ -49,6 +53,8 @@ public:
     bool getHscLR(int index, LocData& pos);
 
     bool getHscLoc(LocData& posData);
+
+    bool getHscProInfo(const std::string &fileName, ProgInfo &info);
 
 protected:
 

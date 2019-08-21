@@ -73,6 +73,12 @@ bool HSC3ROBOT::HscPrgStop(std::string progname)
     return ret == 0 ? true : false;
 }
 
+bool HSC3ROBOT::HscClearFault()
+{
+    ret = proSys->reset();
+    return ret == 0 ? true : false;
+}
+
 bool HSC3ROBOT::setHscR(int index, double value)
 {
     ret = proVar->setR(index,value);
@@ -107,6 +113,20 @@ bool HSC3ROBOT::getHscLR(int index, LocData& pos)
 bool HSC3ROBOT::getHscLoc(LocData &posData)
 {
     ret = proMotion->getLocData(gpId,posData);
+    return ret == 0 ? true : false;
+}
+
+bool HSC3ROBOT::getFaultMessage(ErrLevel &level, std::string &msg)
+{
+    uint64_t code;
+    uint32_t time = 500;
+    ret = proSys->getMessage(level,code,msg,time);
+    return ret == 0 ? true : false;
+}
+
+bool HSC3ROBOT::getHscProInfo(const std::string &fileName, ProgInfo &info)
+{
+    ret = proVm ->getProgInfo(fileName, info);
     return ret == 0 ? true : false;
 }
 

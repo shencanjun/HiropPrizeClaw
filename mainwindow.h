@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <sstream>
 #include "calibratedialog.h"
 #include "voicerecognite.h"
 #include "hsc3robot.h"
@@ -25,7 +26,9 @@ private:
     VoiceRecognite *voice;
     ros::NodeHandle n_MW;
     QTimer *getLocTimer;
+    QTimer *getHscMsgTimer;
     std::string progName;
+    bool HscStatus;
 
 public:
     HSC3ROBOT *hsc3;
@@ -56,6 +59,10 @@ public:
     void setResultHsrLR();
 
     void showHsrLocOnTime();
+
+    void HscMsgStatusLET();
+
+    void HscClearFaultBnt();
 };
 
 #endif // MAINWINDOW_H

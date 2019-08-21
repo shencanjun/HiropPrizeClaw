@@ -7,11 +7,13 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     progName = "HIROP.PRG";
+    HscStatus = true;
     calDialog = new CalibrateDialog();
     calDialog->setWindowTitle("标定");
     voice = new VoiceRecognite(n_MW);
     hsc3 = new HSC3ROBOT();
     getLocTimer = new QTimer(this);
+    getHscMsgTimer = new QTimer(this);
     connect(ui->actionCalibrate,&QAction::triggered,this,&MainWindow::showClibrateDialog);
     connect(ui->pushButton_VoiceRecognition,&QPushButton::clicked,this,&MainWindow::OpenOrCloseVoiceRecognitionBnt);
     connect(ui->pushButton_connectRobot,&QPushButton::clicked,this,&MainWindow::connectHsRobotBnt);
@@ -20,7 +22,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButton_start,&QPushButton::clicked,this,&MainWindow::HsRobotStartBnt);
     connect(voice,&VoiceRecognite::emitResultStr,this,&MainWindow::showVoiceRecognitionResult);
     connect(ui->pushButton_result_set,&QPushButton::clicked,this,&MainWindow::setResultHsrLR);
+    connect(ui->pushButton_clearFault, &QPushButton::clicked, this, &MainWindow::HscClearFaultBnt);
     connect(getLocTimer, &QTimer::timeout, this, &MainWindow::showHsrLocOnTime);
+    connect(getHscMsgTimer, &QTimer::timeout, this, &MainWindow::HscMsgStatusLET);
 }
 
 MainWindow::~MainWindow()
@@ -74,6 +78,10 @@ void MainWindow::showVoiceRecognitionResult(QString str)
 void MainWindow::initRobot()
 {
     bool en;
+    if(!HscStatus)
+    {
+        ui->lineEdit_Msg->setStyleSheet("background-color: rgb(255, 85, 0);");
+    }
     if(hsc3->getHscEnanle(en))
     {
         if(en){
@@ -83,6 +91,21 @@ void MainWindow::initRobot()
         else{
             ui->pushButton_ebnable->setText("使能");
             ui->pushButton_ebnable->setStyleSheet("background-color: rgb(255, 255, 255)");
+        }
+    }
+    const std::string fileName;
+    ProgInfo info;
+    if(hsc3->getHscProInfo(fileName, info))
+    {
+        if(info.state != AUTO_STATE_UNLOAD)
+        {
+            ui->pushButton_Load->setText("卸载");
+            ui->pushButton_Load->setStyleSheet("background-color: rgb(85, 255, 127)");
+        }
+        else if(info.state == AUTO_STATE_RUNNING)
+        {
+            ui->pushButton_start->setText("停止");
+            ui->pushButton_start->setStyleSheet("background-color: rgb(85, 255, 127)");
         }
     }
 }
@@ -101,6 +124,8 @@ void MainWindow::connectHsRobotBnt()
             ui->lineEdit_rip->setReadOnly(true);
             ui->lineEdit_rport->setReadOnly(true);
             getLocTimer->start(1.0);
+            getHscMsgTimer->start(0.5);
+            sleep(0.25);
             initRobot();
             setReturnStrtoUI("<font color = green> 连接机器人成功！！！</font>");
          }
@@ -120,6 +145,7 @@ void MainWindow::connectHsRobotBnt()
             ui->pushButton_connectRobot->setText("连接");
             ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(２55, 255, 255)");
             getLocTimer->stop();
+            getHscMsgTimer->stop();
             setReturnStrtoUI("<font color = green> 断开连接机器人成功！！！</font>");
         }
         else
@@ -136,7 +162,7 @@ void MainWindow::enanleHsRobotBnt()
 {
     if(ui->pushButton_ebnable->text() == "使能")
     {
-        if(hsc3->setHscEnanle(true)){
+        if(hsc3->setHscEnanle(true) && HscStatus){
             ui->pushButton_ebnable->setStyleSheet("background-color: rgb(85, 255, 127)");
             ui->pushButton_ebnable->setText("失能");
             setReturnStrtoUI("<font color = green> 机器人使能成功！！！</font>");
@@ -164,10 +190,9 @@ void MainWindow::enanleHsRobotBnt()
 
 void MainWindow::loadHSRobotPrgBnt()
 {
-    //std::string progname = "HIROP.PRG";
     if(ui->pushButton_Load->text() == "加载")
     {
-        if(hsc3->HscLoadPRG(progName))
+        if(hsc3->HscLoadPRG(progName) && HscStatus)
         {
             ui->pushButton_Load->setText("卸载");
             ui->pushButton_Load->setStyleSheet("background-color: rgb(85, 255, 127)");
@@ -198,7 +223,7 @@ void MainWindow::HsRobotStartBnt()
 {
     if(ui->pushButton_start->text() == "开始" )
     {
-        if(hsc3->HscPrgStart(progName)){
+        if(hsc3->HscPrgStart(progName) && HscStatus){
             ui->pushButton_start->setText("停止");
             ui->pushButton_start->setStyleSheet("background-color: rgb(85, 255, 127)");
             setReturnStrtoUI("<font color = green> 开始运行机器人程序成功！！！</font>");
@@ -278,3 +303,44 @@ void MainWindow::showHsrLocOnTime()
 
 }
 
+void MainWindow::HscMsgStatusLET()
+{
+    ErrLevel level;
+    std::string msg;
+    QString qstr;
+
+    if(!hsc3->getFaultMessage(level,msg))
+    {
+        setReturnStrtoUI("<font color = red> 获取机器人报警！！！ </font>");
+        return;
+    }
+    qstr = QString::fromStdString(msg);
+    if(level == ERR_LEVEL_ERROR || level == ERR_LEVEL_FATAL)
+    {
+        HscStatus = false;
+        ui->lineEdit_Msg->setStyleSheet("background-color: rgb(255, 85, 0);");
+
+        setReturnStrtoUI("<font color = red>" + qstr + "</font>");
+    }
+    else if(level == ERR_LEVEL_WARNING)
+    {
+        setReturnStrtoUI("<font color = yellow>" + qstr + "</font>");
+    }
+    else
+    {
+        setReturnStrtoUI("<font color = black>" + qstr + "</font>");
+    }
+
+    return;
+}
+
+void MainWindow::HscClearFaultBnt()
+{
+    if(!hsc3->HscClearFault())
+    {
+        setReturnStrtoUI("<font color = red> 机器人复位失败！！！ </font>");
+        return;
+    }
+    setReturnStrtoUI("<font color = red> 机器人复位成功！！！ </font>");
+    return;
+}
