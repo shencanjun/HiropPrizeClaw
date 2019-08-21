@@ -3,7 +3,10 @@
 
 #include <QDialog>
 #include <QMessageBox>
+#include <QMenu>
+#include <QAction>
 #include <iostream>
+#include <vector>
 #include "hsc3robot.h"
 
 namespace Ui {
@@ -20,14 +23,17 @@ public:
 
 private:
     Ui::CalibrateDialog *ui;
+    QMenu *tableMenu;
+    QAction *action;
     HSC3ROBOT *Chsc3;
     LocData hscLocData;
+
     int raw;
     int column;
-    const int cColumnX = 0;
-    const int cColumnY = 1;
-    const int rColumnX = 3;
-    const int rColumnY = 4;
+    static const int cColumnX = 0;
+    static const int cColumnY = 1;
+    static const int rColumnX = 3;
+    static const int rColumnY = 4;
 
 private:
     void RecordCalibrateData();
@@ -37,6 +43,10 @@ private:
     void getCalibrationResult();
 
     void SaveCalibration();
+
+    void slotActionDelete();
+
+    void on_tableWidget_customContextMenuRequested(const QPoint &pos);
 
 public:
     void setHsc3Object(HSC3ROBOT *MWhsc3);

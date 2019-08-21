@@ -6,6 +6,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    calDialog = new CalibrateDialog();
+    calDialog->setWindowTitle("标定");
     voice = new VoiceRecognite(n_MW);
     hsc3 = new HSC3ROBOT();
     getLocTimer = new QTimer(this);
@@ -40,8 +42,6 @@ void MainWindow::setReturnStrtoUI(QString str)
 
 void MainWindow::showClibrateDialog()
 {
-    calDialog = new CalibrateDialog();
-    calDialog->setWindowTitle("标定");
     calDialog->setHsc3Object(hsc3);
     calDialog->show();
 }
@@ -50,13 +50,13 @@ void MainWindow::OpenOrCloseVoiceRecognitionBnt()
 {
     if(ui->pushButton_VoiceRecognition->text() == "开始语音识别")
     {
-        setReturnStrtoUI("开始语音识别......");
+        setReturnStrtoUI("<font color = green size = 7> 开始语音识别...... </font>");
         ui->pushButton_VoiceRecognition->setText("停止语音识别");
         voice->startVoiceRecognition();
     }
     else
     {
-        setReturnStrtoUI("停止语音识别......");
+        setReturnStrtoUI("<font color = red size = 7> 停止语音识别...... </font>");
         ui->pushButton_VoiceRecognition->setText("开始语音识别");
         voice->stopVoiceRecognition();
     }
@@ -101,7 +101,7 @@ void MainWindow::connectHsRobotBnt()
             ui->lineEdit_rport->setReadOnly(true);
             getLocTimer->start(1.0);
             initRobot();
-            setReturnStrtoUI("连接机器人成功！！！");
+            setReturnStrtoUI("<font color = green> 连接机器人成功！！！</font>");
          }
          else
          {
@@ -119,7 +119,7 @@ void MainWindow::connectHsRobotBnt()
             ui->pushButton_connectRobot->setText("连接");
             ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(２55, 255, 255)");
             getLocTimer->stop();
-            setReturnStrtoUI("断开连接机器人成功！！！");
+            setReturnStrtoUI("<font color = green> 断开连接机器人成功！！！</font>");
         }
         else
         {
@@ -138,7 +138,7 @@ void MainWindow::enanleHsRobotBnt()
         if(hsc3->setHscEnanle(true)){
             ui->pushButton_ebnable->setStyleSheet("background-color: rgb(85, 255, 127)");
             ui->pushButton_ebnable->setText("失能");
-            setReturnStrtoUI("机器人使能成功！！！");
+            setReturnStrtoUI("<font color = green> 机器人使能成功！！！</font>");
         }
         else
         {
@@ -151,7 +151,7 @@ void MainWindow::enanleHsRobotBnt()
         if(hsc3->setHscEnanle(false)){
             ui->pushButton_ebnable->setStyleSheet("background-color: rgb(255, 255, 255)");
             ui->pushButton_ebnable->setText("使能");
-            setReturnStrtoUI("机器人失能成功！！！");
+            setReturnStrtoUI("<font color = green> 机器人失能成功！！！<font>");
         }
         else
         {
@@ -170,7 +170,7 @@ void MainWindow::loadHSRobotPrgBnt()
         {
             ui->pushButton_Load->setText("卸载");
             ui->pushButton_Load->setStyleSheet("background-color: rgb(85, 255, 127)");
-            setReturnStrtoUI("机器人加载程序成功！！！");
+            setReturnStrtoUI("<font color = green> 机器人加载程序成功！！！</font>");
         }
         else
         {
@@ -183,7 +183,7 @@ void MainWindow::loadHSRobotPrgBnt()
         {
             ui->pushButton_Load->setText("加载");
             ui->pushButton_Load->setStyleSheet("background-color: rgb(255, 255, 255)");
-            setReturnStrtoUI("机器人卸载程序成功！！！");
+            setReturnStrtoUI("<font color = green> 机器人卸载程序成功！！！</font>");
         }
         else
         {
@@ -200,7 +200,7 @@ void MainWindow::HsRobotStartBnt()
         if(hsc3->HscPrgStart()){
             ui->pushButton_start->setText("停止");
             ui->pushButton_start->setStyleSheet("background-color: rgb(85, 255, 127)");
-            setReturnStrtoUI("开始运行机器人程序成功！！！");
+            setReturnStrtoUI("<font color = green> 开始运行机器人程序成功！！！</font>");
         }
         else
         {
@@ -212,7 +212,7 @@ void MainWindow::HsRobotStartBnt()
         if(hsc3->HscPrgStop()){
             ui->pushButton_start->setText("停止");
             ui->pushButton_start->setStyleSheet("background-color: rgb(85, 255, 127)");
-            setReturnStrtoUI("停止运行机器人程序成功！！！");
+            setReturnStrtoUI("<font color = green> 停止运行机器人程序成功！！！</font>");
         }
         else
         {
@@ -256,6 +256,7 @@ void MainWindow::setResultHsrLR()
 void MainWindow::showHsrLocOnTime()
 {
     LocData locdata;
+    int bitNum = 2;
 
     if(!hsc3->getHscLoc(locdata))
     {
@@ -265,12 +266,12 @@ void MainWindow::showHsrLocOnTime()
     if(locdata.size() < 6)
         return;
 
-    ui->label_X->setText(QString::number(locdata[0], 'f', 4));
-    ui->label_Y->setText(QString::number(locdata[1], 'f', 4));
-    ui->label_Z->setText(QString::number(locdata[2], 'f', 4));
-    ui->label_A->setText(QString::number(locdata[3], 'f', 4));
-    ui->label_B->setText(QString::number(locdata[4], 'f', 4));
-    ui->label_C->setText(QString::number(locdata[5], 'f', 4));
+    ui->label_X->setText(QString::number(locdata[0], 'f', bitNum));
+    ui->label_Y->setText(QString::number(locdata[1], 'f', bitNum));
+    ui->label_Z->setText(QString::number(locdata[2], 'f', bitNum));
+    ui->label_A->setText(QString::number(locdata[3], 'f', bitNum));
+    ui->label_B->setText(QString::number(locdata[4], 'f', bitNum));
+    ui->label_C->setText(QString::number(locdata[5], 'f', bitNum));
 
     return;
 

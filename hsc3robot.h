@@ -64,7 +64,7 @@ protected:
 
     LocData LocPosData;
 
-    const int8_t gpId = 0;
+    static const int8_t gpId = 0;
 };
 
 #endif // HSC3ROBOT_H
