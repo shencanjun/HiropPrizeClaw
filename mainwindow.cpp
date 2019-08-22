@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
     progName = "HIROP.PRG";
     HscStatus = true;
     calDialog = new CalibrateDialog();
@@ -14,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     hsc3 = new HSC3ROBOT();
     getLocTimer = new QTimer(this);
     getHscMsgTimer = new QTimer(this);
+    showImageTimer = new QTimer(this);
     connect(ui->actionCalibrate,&QAction::triggered,this,&MainWindow::showClibrateDialog);
     connect(ui->pushButton_VoiceRecognition,&QPushButton::clicked,this,&MainWindow::OpenOrCloseVoiceRecognitionBnt);
     connect(ui->pushButton_connectRobot,&QPushButton::clicked,this,&MainWindow::connectHsRobotBnt);
@@ -25,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButton_clearFault, &QPushButton::clicked, this, &MainWindow::HscClearFaultBnt);
     connect(getLocTimer, &QTimer::timeout, this, &MainWindow::showHsrLocOnTime);
     connect(getHscMsgTimer, &QTimer::timeout, this, &MainWindow::HscMsgStatusLET);
+    connect(ui->actionOpenImage, &QAction::triggered, this, &MainWindow::showImagelabel);
+    connect(showImageTimer, &QTimer::timeout, this, &MainWindow::showImageLabelChange);
 }
 
 MainWindow::~MainWindow()
@@ -113,7 +117,7 @@ void MainWindow::initRobot()
 void MainWindow::connectHsRobotBnt()
 {
     std::string ipstr = ui->lineEdit_rip->text().toStdString();
-    uint16_t port = ui->lineEdit_rport->text().toShort();
+    uint16_t port = ui->lineEdit_rport->text().toUShort();
 
     if(ui->pushButton_connectRobot->text() == "连接")
     {
@@ -124,8 +128,8 @@ void MainWindow::connectHsRobotBnt()
             ui->lineEdit_rip->setReadOnly(true);
             ui->lineEdit_rport->setReadOnly(true);
             getLocTimer->start(1.0);
-            getHscMsgTimer->start(0.5);
-            sleep(0.25);
+            getHscMsgTimer->start(1.0);
+            sleep(1);
             initRobot();
             setReturnStrtoUI("<font color = green> 连接机器人成功！！！</font>");
          }
@@ -343,4 +347,48 @@ void MainWindow::HscClearFaultBnt()
     }
     setReturnStrtoUI("<font color = red> 机器人复位成功！！！ </font>");
     return;
+}
+
+void MainWindow::showImagelabel()
+{
+    //QImage *img = new QImage();
+    showImageTimer->stop();
+    imageFileName = QFileDialog::getOpenFileName(this,"打开图片","","Image (*.png *.bmp *.jpg *.tif *.GIF )");
+    if(imageFileName.isEmpty())
+        return;
+    //imp.load(imageFileName);
+    if(!(imp.load(imageFileName)))
+    {
+        {
+             QMessageBox::information(this,
+                                             tr("打开图像失败"),
+                                             tr("打开图像失败!"));
+             delete &imp;
+             return;
+         }
+    }
+
+
+    showImageTimer->start(100);
+
+//    QPixmap nimp = imp.scaled(ui->label_show_image->width(),ui->label_show_image->height());
+
+//    QPainter painter(this);
+
+//    painter.drawPixmap(0,0,nimp);
+
+//    ui->label_show_image->setPixmap(nimp);
+    return;
+}
+
+void MainWindow::showImageLabelChange()
+{
+    if(&imp == NULL)
+        return;
+    QPixmap nimp = imp.scaled(ui->label_show_image->width(),ui->label_show_image->height());
+    QPainter painter(this);
+
+    painter.drawPixmap(0,0,nimp);
+
+    ui->label_show_image->setPixmap(nimp);
 }

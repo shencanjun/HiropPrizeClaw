@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QFileDialog>
+#include <QPainter>
 #include <QTimer>
 #include <sstream>
 #include "calibratedialog.h"
@@ -27,6 +29,9 @@ private:
     ros::NodeHandle n_MW;
     QTimer *getLocTimer;
     QTimer *getHscMsgTimer;
+    QTimer *showImageTimer;
+    QPixmap imp;
+    QString imageFileName;
     std::string progName;
     bool HscStatus;
 
@@ -63,6 +68,10 @@ public:
     void HscMsgStatusLET();
 
     void HscClearFaultBnt();
+
+    void showImagelabel();
+
+    void showImageLabelChange();
 };
 
 #endif // MAINWINDOW_H

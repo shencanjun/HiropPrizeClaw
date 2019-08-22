@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1266</width>
-    <height>826</height>
+    <width>1246</width>
+    <height>873</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,11 +18,54 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_3">
-    <item row="0" column="0">
+    <item row="1" column="2">
+     <widget class="Line" name="line_9">
+      <property name="styleSheet">
+       <string notr="true">background-color: qlineargradient(spread:pad, x1:0.119, y1:1, x2:1, y2:1, stop:0.242268 rgba(60, 78, 139, 241), stop:1 rgba(255, 255, 255, 255));</string>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="Line" name="line_8">
+      <property name="styleSheet">
+       <string notr="true">background-color: qlineargradient(spread:pad, x1:0.119, y1:1, x2:1, y2:1, stop:0.242268 rgba(60, 78, 139, 241), stop:1 rgba(255, 255, 255, 255));</string>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="Line" name="line_10">
+      <property name="styleSheet">
+       <string notr="true">background-color: qlineargradient(spread:pad, x1:0.119, y1:1, x2:1, y2:1, stop:0.242268 rgba(60, 78, 139, 241), stop:1 rgba(255, 255, 255, 255));</string>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
      <layout class="QGridLayout" name="gridLayout_2" rowstretch="7,0,0">
       <property name="leftMargin">
        <number>0</number>
       </property>
+      <item row="1" column="0">
+       <widget class="Line" name="line_2">
+        <property name="styleSheet">
+         <string notr="true">background-color: qlineargradient(spread:pad, x1:0.119, y1:1, x2:1, y2:1, stop:0.242268 rgba(60, 78, 139, 241), stop:1 rgba(255, 255, 255, 255));</string>
+        </property>
+        <property name="lineWidth">
+         <number>3</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
       <item row="2" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0,2">
         <item>
@@ -34,8 +77,8 @@
            <string>机器人</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_9">
-           <item row="0" column="0">
-            <layout class="QGridLayout" name="gridLayout_8" columnstretch="3,7">
+           <item row="0" column="1">
+            <layout class="QGridLayout" name="gridLayout_8" columnstretch="3,0,0">
              <item row="0" column="0">
               <widget class="QGroupBox" name="groupBox_5">
                <property name="autoFillBackground">
@@ -44,159 +87,183 @@
                <property name="title">
                 <string>当前位置：</string>
                </property>
-               <layout class="QGridLayout" name="gridLayout_5">
+               <layout class="QGridLayout" name="gridLayout_4">
                 <item row="0" column="0">
-                 <layout class="QGridLayout" name="gridLayout_4" columnstretch="3,7">
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_2">
-                    <property name="font">
-                     <font>
-                      <pointsize>15</pointsize>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>X:</string>
-                    </property>
-                   </widget>
+                 <layout class="QVBoxLayout" name="verticalLayout_2">
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_6">
+                    <item>
+                     <widget class="QLabel" name="label_2">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>X:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_X">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>0.0000</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
-                  <item row="0" column="1">
-                   <widget class="QLabel" name="label_X">
-                    <property name="font">
-                     <font>
-                      <pointsize>15</pointsize>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>0.00000000</string>
-                    </property>
-                   </widget>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_7">
+                    <item>
+                     <widget class="QLabel" name="label_3">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>Y:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_Y">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>0.0000</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_3">
-                    <property name="font">
-                     <font>
-                      <pointsize>15</pointsize>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>Y:</string>
-                    </property>
-                   </widget>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_8">
+                    <item>
+                     <widget class="QLabel" name="label_4">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>Z:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_Z">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>0.0000</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QLabel" name="label_Y">
-                    <property name="font">
-                     <font>
-                      <pointsize>15</pointsize>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>0.000</string>
-                    </property>
-                   </widget>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_9">
+                    <item>
+                     <widget class="QLabel" name="label_5">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>A:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_A">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>0.0000</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="label_4">
-                    <property name="font">
-                     <font>
-                      <pointsize>15</pointsize>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>Z:</string>
-                    </property>
-                   </widget>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_10">
+                    <item>
+                     <widget class="QLabel" name="label_6">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>B:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_B">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>0.0000</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
-                  <item row="2" column="1">
-                   <widget class="QLabel" name="label_Z">
-                    <property name="font">
-                     <font>
-                      <pointsize>15</pointsize>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>0.000</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="0">
-                   <widget class="QLabel" name="label_5">
-                    <property name="font">
-                     <font>
-                      <pointsize>15</pointsize>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>A:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="1">
-                   <widget class="QLabel" name="label_A">
-                    <property name="font">
-                     <font>
-                      <pointsize>15</pointsize>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>0.000</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="0">
-                   <widget class="QLabel" name="label_6">
-                    <property name="font">
-                     <font>
-                      <pointsize>15</pointsize>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>B:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="1">
-                   <widget class="QLabel" name="label_B">
-                    <property name="font">
-                     <font>
-                      <pointsize>15</pointsize>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>0.000</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="0">
-                   <widget class="QLabel" name="label_7">
-                    <property name="font">
-                     <font>
-                      <pointsize>15</pointsize>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>C:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="1">
-                   <widget class="QLabel" name="label_C">
-                    <property name="font">
-                     <font>
-                      <pointsize>15</pointsize>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>0.000</string>
-                    </property>
-                   </widget>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_11">
+                    <item>
+                     <widget class="QLabel" name="label_7">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>C:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_C">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>0.0000</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
                  </layout>
                 </item>
                </layout>
               </widget>
              </item>
-             <item row="0" column="1" alignment="Qt::AlignHCenter">
+             <item row="0" column="2" alignment="Qt::AlignHCenter">
               <widget class="QGroupBox" name="groupBox_6">
                <property name="title">
                 <string>操作</string>
@@ -281,7 +348,13 @@
                       </rect>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">background-color: rgb(255, 255, 255);</string>
+                      <string notr="true">QPushButton { color:  black; 
+	background-color: rgb(255, 255, 255);	
+} 
+QPushButton:checked{ background-color: yellow;}
+QPushButton:hover{  background-color: rgb(186, 189, 182); 
+border-style: outset;  } 
+QWidget:focus{outline: none;}</string>
                      </property>
                      <property name="text">
                       <string>使能</string>
@@ -297,7 +370,13 @@
                       </rect>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">background-color: rgb(255, 255, 255);</string>
+                      <string notr="true">QPushButton { color:  black; 
+	background-color: rgb(255, 255, 255);	
+} 
+QPushButton:checked{ background-color: yellow;}
+QPushButton:hover{  background-color: rgb(186, 189, 182); 
+border-style: outset;  } 
+QWidget:focus{outline: none;}</string>
                      </property>
                      <property name="text">
                       <string>开始</string>
@@ -313,7 +392,15 @@
                       </rect>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">background-color: rgb(255, 255, 255);</string>
+                      <string notr="true">QPushButton { color:  black; 
+	background-color: rgb(255, 255, 255);	
+} 
+QPushButton:checked{ background-color: yellow;}
+QPushButton:hover{  background-color: rgb(186, 189, 182); 
+border-style: outset;  } 
+QWidget:focus{outline: none;}
+	
+	</string>
                      </property>
                      <property name="text">
                       <string>连接</string>
@@ -329,7 +416,13 @@
                       </rect>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">background-color: rgb(255, 255, 255);</string>
+                      <string notr="true">QPushButton { color:  black; 
+	background-color: rgb(255, 255, 255);	
+} 
+QPushButton:checked{ background-color: yellow;}
+QPushButton:hover{  background-color: rgb(186, 189, 182); 
+border-style: outset;  } 
+QWidget:focus{outline: none;}</string>
                      </property>
                      <property name="text">
                       <string>加载</string>
@@ -364,7 +457,13 @@
                       </rect>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">background-color: rgb(255, 255, 255);</string>
+                      <string notr="true">QPushButton { color:  black; 
+	background-color: rgb(255, 255, 255);	
+} 
+QPushButton:checked{ background-color: yellow;}
+QPushButton:hover{  background-color: rgb(186, 189, 182); 
+border-style: outset;  } 
+QWidget:focus{outline: none;}</string>
                      </property>
                      <property name="text">
                       <string>复位</string>
@@ -377,6 +476,16 @@
                </layout>
               </widget>
              </item>
+             <item row="0" column="1">
+              <widget class="Line" name="line_4">
+               <property name="styleSheet">
+                <string notr="true">background-color: qlineargradient(spread:pad, x1:0.119, y1:1, x2:1, y2:1, stop:0.242268 rgba(60, 78, 139, 241), stop:1 rgba(255, 255, 255, 255));</string>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </widget>
+             </item>
             </layout>
            </item>
           </layout>
@@ -384,6 +493,9 @@
         </item>
         <item>
          <widget class="Line" name="line">
+          <property name="styleSheet">
+           <string notr="true">background-color: qlineargradient(spread:pad, x1:0.119, y1:1, x2:1, y2:1, stop:0.242268 rgba(60, 78, 139, 241), stop:1 rgba(255, 255, 255, 255));</string>
+          </property>
           <property name="lineWidth">
            <number>4</number>
           </property>
@@ -402,7 +514,7 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_11">
            <item row="0" column="0">
-            <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="3,7">
+            <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="3,0,7">
              <item>
               <widget class="QWidget" name="widget_2" native="true">
                <property name="minimumSize">
@@ -427,7 +539,13 @@
                  </rect>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">background-color: rgb(255, 255, 255);</string>
+                 <string notr="true">QPushButton { color:  black; 
+	background-color: rgb(255, 255, 255);	
+} 
+QPushButton:checked{ background-color: yellow;}
+QPushButton:hover{  background-color: rgb(186, 189, 182); 
+border-style: outset;  } 
+QWidget:focus{outline: none;}</string>
                 </property>
                 <property name="text">
                  <string>手动抓取</string>
@@ -443,12 +561,28 @@
                  </rect>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">background-color: rgb(255, 255, 255);</string>
+                 <string notr="true">QPushButton { color:  black; 
+	background-color: rgb(255, 255, 255);	
+} 
+QPushButton:checked{ background-color: yellow;}
+QPushButton:hover{  background-color: rgb(186, 189, 182); 
+border-style: outset;  } 
+QWidget:focus{outline: none;}</string>
                 </property>
                 <property name="text">
                  <string>开始语音识别</string>
                 </property>
                </widget>
+              </widget>
+             </item>
+             <item>
+              <widget class="Line" name="line_6">
+               <property name="styleSheet">
+                <string notr="true">background-color: qlineargradient(spread:pad, x1:0.119, y1:1, x2:1, y2:1, stop:0.242268 rgba(60, 78, 139, 241), stop:1 rgba(255, 255, 255, 255));</string>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
               </widget>
              </item>
              <item>
@@ -478,6 +612,22 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="text">
            <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="Line" name="line_3">
+          <property name="styleSheet">
+           <string notr="true">background-color: qlineargradient(spread:pad, x1:0.119, y1:1, x2:1, y2:1, stop:0.242268 rgba(60, 78, 139, 241), stop:1 rgba(255, 255, 255, 255));</string>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
          </widget>
         </item>
@@ -780,10 +930,19 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>80</x>
-                  <y>180</y>
+                  <y>170</y>
                   <width>101</width>
                   <height>41</height>
                  </rect>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton { color:  black; 
+	background-color: rgb(255, 255, 255);	
+} 
+QPushButton:checked{ background-color: yellow;}
+QPushButton:hover{  background-color: rgb(186, 189, 182); 
+border-style: outset;  } 
+QWidget:focus{outline: none;}</string>
                 </property>
                 <property name="text">
                  <string>设置LR</string>
@@ -818,35 +977,19 @@ p, li { white-space: pre-wrap; }
           </layout>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="Line" name="line_3">
-          <property name="frameShadow">
-           <enum>QFrame::Sunken</enum>
-          </property>
-          <property name="lineWidth">
-           <number>3</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
-      <item row="1" column="0">
-       <widget class="Line" name="line_2">
-        <property name="styleSheet">
-         <string notr="true">color: rgb(85, 0, 255);</string>
-        </property>
-        <property name="lineWidth">
-         <number>3</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
      </layout>
+    </item>
+    <item row="2" column="1">
+     <widget class="Line" name="line_7">
+      <property name="styleSheet">
+       <string notr="true">background-color: qlineargradient(spread:pad, x1:0.119, y1:1, x2:1, y2:1, stop:0.242268 rgba(60, 78, 139, 241), stop:1 rgba(255, 255, 255, 255));</string>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -855,8 +998,8 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1266</width>
-     <height>31</height>
+     <width>1246</width>
+     <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHIRO">
@@ -864,12 +1007,18 @@ p, li { white-space: pre-wrap; }
      <string>HIROP</string>
     </property>
     <addaction name="actionCalibrate"/>
+    <addaction name="actionOpenImage"/>
    </widget>
    <addaction name="menuHIRO"/>
   </widget>
   <action name="actionCalibrate">
    <property name="text">
     <string>标定</string>
+   </property>
+  </action>
+  <action name="actionOpenImage">
+   <property name="text">
+    <string>打开</string>
    </property>
   </action>
  </widget>

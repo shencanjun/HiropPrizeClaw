@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include "hsc3robot.h"
+#include "Calibration.h"
 
 namespace Ui {
 class CalibrateDialog;
@@ -26,6 +27,7 @@ private:
     QMenu *tableMenu;
     QAction *action;
     HSC3ROBOT *Chsc3;
+    EyeCalib2D *Calib2D;
     LocData hscLocData;
 
     int raw;
