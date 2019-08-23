@@ -9,6 +9,7 @@
 #include "calibratedialog.h"
 #include "voicerecognite.h"
 #include "hsc3robot.h"
+#include "camraoperate.h"
 
 namespace Ui {
 class MainWindow;
@@ -30,13 +31,25 @@ private:
     QTimer *getLocTimer;
     QTimer *getHscMsgTimer;
     QTimer *showImageTimer;
+    QTimer *moveTimer;
     QPixmap imp;
     QString imageFileName;
+    std::string camImageFileName;
+    std::string camXmlFileName;
     std::string progName;
     bool HscStatus;
+    double camX;
+    double camY;
+    double isDetesion;
+    double squareX;
+    double squareY;
+    double squareWidth;
+    double squareHeigth;
+    std::vector<double> detesionRPose;
 
 public:
     HSC3ROBOT *hsc3;
+    CamraOperate *camOpera;
 
 public:
     void setReturnStrtoUI(QString str);
@@ -72,6 +85,20 @@ public:
     void showImagelabel();
 
     void showImageLabelChange();
+
+    void connectCamraBnt();
+
+    void camTakePirtureBnt();
+
+    void camGetImageBnt();
+
+    void detesionBnt();
+
+    void getCamPose(geometry_msgs::Pose pose);
+
+    void startMaulModeBnt();
+
+    void startMove();
 };
 
 #endif // MAINWINDOW_H

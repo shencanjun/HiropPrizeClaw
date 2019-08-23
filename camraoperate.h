@@ -1,15 +1,27 @@
 #ifndef CAMRAOPERATE_H
 #define CAMRAOPERATE_H
 
+#include <QObject>
 #include <ros/ros.h>
 #include <hkcamera_bridge/HkCameraData.h>
 #include <sensor_msgs/Image.h>
+#include <vision_bridge/ObjectArray.h>
+#include <vision_bridge/ObjectInfo.h>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
+#include <opencv2/opencv.hpp>
+#include <Calibration.h>
+#include <geometry_msgs/Pose.h>
 
-class CamraOperate
+class CamraOperate : public QObject
 {
+    Q_OBJECT
+
 public:
     CamraOperate(ros::NodeHandle n);
     ~CamraOperate();
+
+    void startCamraService();
 
     bool connectCamra();
 
@@ -17,14 +29,55 @@ public:
 
     bool getImage();
 
+    bool sendtImage();
+
     bool disconnectCamra();
 
-    void getImage_callback(sensor_msgs::Image::ConstPtr &msg);
+    bool startEyeCalirating();
+
+    bool writeCalibrateData(float rx, float ry, int num);
+
+    bool readEyeData(float &cx, float &cy,float &rx, float &ry, int num);
+
+    bool getCalibrateResult(double accu);
+
+    bool readClibrateData();
+
+    bool getDetesionResult(int x, int y, std::vector<double> &pose);
+
+private:
+    void getImage_callback(const sensor_msgs::ImageConstPtr &msg);
+
+    void getObjectArray_callback(const vision_bridge::ObjectArray::ConstPtr &msg);
+
+public:
+    void send(geometry_msgs::Pose pose) const{
+        emit emitResultCam(pose);
+    }
+
+signals:
+    void emitResultCam(geometry_msgs::Pose) const;
+
+public:
+    std::string imgFileName;
+    std::string camCalibXmlFileName;
 
 private:
     ros::NodeHandle n_camra;
+    ros::Subscriber subImage;
+    ros::Subscriber subPose;
     ros::ServiceClient clientCamra;
     hkcamera_bridge::HkCameraData hkCamraSrv;
+
+    cv_bridge::CvImagePtr color_ptr;
+    cv::Mat colorImg;
+
+    //vision_bridge::ObjectArray objectArray;
+    //vision_bridge::ObjectInfo objectInfo;
+    geometry_msgs::Pose resultPose;
+
+    EyeCalib2D *Calib2D;
+
 
 };
 

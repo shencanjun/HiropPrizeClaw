@@ -11,9 +11,9 @@ CalibrateDialog::CalibrateDialog(QWidget *parent) :
     tableMenu = new QMenu(ui->tableWidget);
     tableMenu->setStyleSheet("background-color: rgb(255, 255, 255)");
     action = new QAction("删除", this);
-    Calib2D = new EyeCalib2D();
     connect(action, &QAction::triggered, this, &CalibrateDialog::slotActionDelete);
-    connect(ui->pushButton_record,&QPushButton::clicked,this,&CalibrateDialog::RecordCalibrateData);
+    connect(ui->pushButton_startCalib, &QPushButton::clicked, this, &CalibrateDialog::startCalibration);
+    connect(ui->pushButton_record,&QPushButton::clicked,this,&CalibrateDialog::recordCalibrateData);
     connect(ui->tableWidget, &QTableWidget::customContextMenuRequested, this, &CalibrateDialog::on_tableWidget_customContextMenuRequested);
 }
 
@@ -22,13 +22,23 @@ CalibrateDialog::~CalibrateDialog()
     delete ui;
 }
 
-void CalibrateDialog::setHsc3Object(HSC3ROBOT *MWhsc3)
+void CalibrateDialog::setOpeaObject(HSC3ROBOT *MWhsc3, CamraOperate *cam)
 {
     Chsc3 = MWhsc3;
+    camCalib = cam;
     return;
 }
 
-void CalibrateDialog::RecordCalibrateData()
+void CalibrateDialog::startCalibration()
+{
+    if(!camCalib->startEyeCalirating())
+    {
+        QMessageBox::warning(NULL, "提示", "<font color = red >开始标定失败!!!</font>", QMessageBox::Yes);
+    }
+    return;
+}
+
+void CalibrateDialog::recordCalibrateData()
 {
     LocData data;
     std::vector<float> eyeCalib;
@@ -43,22 +53,38 @@ void CalibrateDialog::RecordCalibrateData()
         return;
     }
 
-    Calib2D->readEyeCalib(eyeCalib,raw);
-    if(eyeCalib.size() <= 0)
-        return;
-
     hscLocData = data;
+    if(!camCalib->writeCalibrateData(data[0],data[1],raw))
+    {
+        return;
+    }
 
-    ui->tableWidget->setItem(raw, cColumnX, new QTableWidgetItem(QString::number(eyeCalib[0])));
-    ui->tableWidget->setItem(raw, cColumnY, new QTableWidgetItem(QString::number(eyeCalib[1])));
-    ui->tableWidget->setItem(raw, rColumnX, new QTableWidgetItem(QString::number(data[0],'f',4)));
-    ui->tableWidget->setItem(raw, rColumnY, new QTableWidgetItem(QString::number(data[1],'f',4)));
-    Calib2D->writeEyeCalib(eyeCalib[0], eyeCalib[1],data[0], data[1], raw);
+    float cx, cy, rx, ry;
+    if(!camCalib->readEyeData(cx, cy, rx, ry, raw))
+    {
+        return;
+    }
+    ui->tableWidget->setItem(raw, cColumnX, new QTableWidgetItem(QString::number(cx, 'f', 4)));
+    ui->tableWidget->setItem(raw, cColumnY, new QTableWidgetItem(QString::number(cy, 'f', 4)));
+    ui->tableWidget->setItem(raw, rColumnX, new QTableWidgetItem(QString::number(rx, 'f', 4)));
+    ui->tableWidget->setItem(raw, rColumnY, new QTableWidgetItem(QString::number(ry, 'f', 4)));
 
     raw++;
     if(raw >= 9)
         raw = 0;
 
+    return;
+}
+
+void CalibrateDialog::getCalibrationResult()
+{
+    double accu;
+    if(!camCalib->getCalibrateResult(accu))
+    {
+        QMessageBox::warning(NULL, "提示", "<font color = red >标定失败!!!</font>", QMessageBox::Yes);
+    }
+
+    ui->label_accuary->setText(QString::number(accu, 'f', 4));
     return;
 }
 
@@ -76,11 +102,4 @@ void CalibrateDialog::slotActionDelete()
     return;
 }
 
-void CalibrateDialog::getCalibrationResult()
-{
-    const std::string fileName = "calibration.xml";
-    double accuary;
-    Calib2D->estimaHom2D(fileName,accuary);
-    ui->label_accuary->setText(QString::number(accuary,'f',4));
-    return;
-}
+

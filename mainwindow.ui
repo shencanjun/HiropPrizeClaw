@@ -929,8 +929,8 @@ p, li { white-space: pre-wrap; }
                <widget class="QPushButton" name="pushButton_result_set">
                 <property name="geometry">
                  <rect>
-                  <x>80</x>
-                  <y>170</y>
+                  <x>160</x>
+                  <y>180</y>
                   <width>101</width>
                   <height>41</height>
                  </rect>
@@ -948,26 +948,96 @@ QWidget:focus{outline: none;}</string>
                  <string>设置LR</string>
                 </property>
                </widget>
+               <widget class="QPushButton" name="pushButton_detesion">
+                <property name="geometry">
+                 <rect>
+                  <x>30</x>
+                  <y>180</y>
+                  <width>101</width>
+                  <height>41</height>
+                 </rect>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton { color:  black; 
+	background-color: rgb(255, 255, 255);	
+} 
+QPushButton:checked{ background-color: yellow;}
+QPushButton:hover{  background-color: rgb(186, 189, 182); 
+border-style: outset;  } 
+QWidget:focus{outline: none;}</string>
+                </property>
+                <property name="text">
+                 <string>识别</string>
+                </property>
+               </widget>
               </widget>
              </item>
              <item>
               <widget class="QWidget" name="widget_5" native="true">
-               <widget class="QLabel" name="label_27">
+               <widget class="QPushButton" name="pushButton_openCam">
                 <property name="geometry">
                  <rect>
-                  <x>60</x>
+                  <x>20</x>
                   <y>20</y>
-                  <width>171</width>
+                  <width>81</width>
                   <height>51</height>
                  </rect>
                 </property>
-                <property name="font">
-                 <font>
-                  <pointsize>25</pointsize>
-                 </font>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton { color:  black; 
+	background-color: rgb(255, 255, 255);	
+} 
+QPushButton:checked{ background-color: yellow;}
+QPushButton:hover{  background-color: rgb(186, 189, 182); 
+border-style: outset;  } 
+QWidget:focus{outline: none;}</string>
                 </property>
                 <property name="text">
-                 <string>识别成功</string>
+                 <string>打开相机</string>
+                </property>
+               </widget>
+               <widget class="QPushButton" name="pushButton_takePirture">
+                <property name="geometry">
+                 <rect>
+                  <x>110</x>
+                  <y>20</y>
+                  <width>81</width>
+                  <height>51</height>
+                 </rect>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton { color:  black; 
+	background-color: rgb(255, 255, 255);	
+} 
+QPushButton:checked{ background-color: yellow;}
+QPushButton:hover{  background-color: rgb(186, 189, 182); 
+border-style: outset;  } 
+QWidget:focus{outline: none;}</string>
+                </property>
+                <property name="text">
+                 <string>拍照</string>
+                </property>
+               </widget>
+               <widget class="QPushButton" name="pushButton_getImg">
+                <property name="geometry">
+                 <rect>
+                  <x>200</x>
+                  <y>20</y>
+                  <width>81</width>
+                  <height>51</height>
+                 </rect>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton { color:  black; 
+	background-color: rgb(255, 255, 255);	
+} 
+QPushButton:checked{ background-color: yellow;}
+QPushButton:hover{  background-color: rgb(186, 189, 182); 
+border-style: outset;  } 
+QWidget:focus{outline: none;}</string>
+                </property>
+                <property name="text">
+                 <string>获取图片</string>
                 </property>
                </widget>
               </widget>

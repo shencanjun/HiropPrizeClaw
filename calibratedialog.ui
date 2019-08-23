@@ -16,7 +16,7 @@
   <widget class="QPushButton" name="pushButton_record">
    <property name="geometry">
     <rect>
-     <x>50</x>
+     <x>210</x>
      <y>550</y>
      <width>151</width>
      <height>51</height>
@@ -29,7 +29,7 @@
   <widget class="QPushButton" name="pushButton_clibrate">
    <property name="geometry">
     <rect>
-     <x>300</x>
+     <x>390</x>
      <y>550</y>
      <width>151</width>
      <height>51</height>
@@ -42,7 +42,7 @@
   <widget class="QPushButton" name="pushButton_save">
    <property name="geometry">
     <rect>
-     <x>550</x>
+     <x>580</x>
      <y>550</y>
      <width>151</width>
      <height>51</height>
@@ -465,6 +465,19 @@ p, li { white-space: pre-wrap; }
      <string>0.000</string>
     </property>
    </widget>
+  </widget>
+  <widget class="QPushButton" name="pushButton_startCalib">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>550</y>
+     <width>151</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>开始标定</string>
+   </property>
   </widget>
  </widget>
  <resources/>

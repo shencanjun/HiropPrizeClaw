@@ -8,7 +8,7 @@
 #include <iostream>
 #include <vector>
 #include "hsc3robot.h"
-#include "Calibration.h"
+#include "camraoperate.h"
 
 namespace Ui {
 class CalibrateDialog;
@@ -27,7 +27,7 @@ private:
     QMenu *tableMenu;
     QAction *action;
     HSC3ROBOT *Chsc3;
-    EyeCalib2D *Calib2D;
+    CamraOperate *camCalib;
     LocData hscLocData;
 
     int raw;
@@ -38,7 +38,9 @@ private:
     static const int rColumnY = 4;
 
 private:
-    void RecordCalibrateData();
+    void startCalibration();
+
+    void recordCalibrateData();
 
     void setCalibrateConfig();
 
@@ -51,7 +53,7 @@ private:
     void on_tableWidget_customContextMenuRequested(const QPoint &pos);
 
 public:
-    void setHsc3Object(HSC3ROBOT *MWhsc3);
+    void setOpeaObject(HSC3ROBOT *MWhsc3, CamraOperate *cam);
 
 };
 

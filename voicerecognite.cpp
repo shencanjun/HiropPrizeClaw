@@ -68,10 +68,10 @@ void VoiceRecognite::threadIntent()
 int VoiceRecognite::startVoiceRecognition()
 {
     hirop_msgs::StartListen startListen;
+    subUserIntent = nVoice.subscribe("/user_intent",1,&VoiceRecognite::listenVoice_callback,this);
     if(clientSatrtListener.call(startListen))
     {
         std::cout<<"start listen succeeful!!!"<<std::endl;
-        subUserIntent = nVoice.subscribe("/user_intent",1,&VoiceRecognite::listenVoice_callback,this);
         //threadIntent();
     }
     else
