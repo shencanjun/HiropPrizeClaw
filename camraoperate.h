@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <ros/ros.h>
+#include <QMetaType>
 #include <hkcamera_bridge/HkCameraData.h>
 #include <sensor_msgs/Image.h>
 #include <vision_bridge/ObjectArray.h>

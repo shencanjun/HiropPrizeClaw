@@ -17,14 +17,17 @@ void CamraOperate::startCamraService()
 {
     subImage = n_camra.subscribe("camera/hk/image_raw", 1, &CamraOperate::getImage_callback, this);
     subPose = n_camra.subscribe("object_array", 1, &CamraOperate::getObjectArray_callback, this);
+    std::cout<<"start Service"<<std::endl;
     return;
 }
 
 bool CamraOperate::connectCamra()
 {
     hkCamraSrv.request.cmd = 1;
-    if(clientCamra.call(hkCamraSrv) != 0)
+    clientCamra.call(hkCamraSrv);
+    if(hkCamraSrv.response.result != 0)
     {      
+        std::cout<<hkCamraSrv.response.result<<std::endl;
         return false;
     }
     std::cout<<hkCamraSrv.response.result<<std::endl;
@@ -34,8 +37,10 @@ bool CamraOperate::connectCamra()
 bool CamraOperate::disconnectCamra()
 {
     hkCamraSrv.request.cmd = 4;
-    if(clientCamra.call(hkCamraSrv) != 0)
+    clientCamra.call(hkCamraSrv);
+    if(hkCamraSrv.response.result != 0)
     {
+        std::cout<<hkCamraSrv.response.result<<std::endl;
         return false;
     }
     return true;
@@ -44,7 +49,8 @@ bool CamraOperate::disconnectCamra()
 bool CamraOperate::takePicture()
 {
     hkCamraSrv.request.cmd = 2;
-    if(clientCamra.call(hkCamraSrv) != 0)
+    clientCamra.call(hkCamraSrv);
+    if(hkCamraSrv.response.result != 0)
     {
         return false;
     }
@@ -54,7 +60,8 @@ bool CamraOperate::takePicture()
 bool CamraOperate::getImage()
 {
     hkCamraSrv.request.cmd = 3;
-    if(clientCamra.call(hkCamraSrv) != 0)
+    clientCamra.call(hkCamraSrv);
+    if(hkCamraSrv.response.result != 0)
     {
         return false;
     }
@@ -63,11 +70,12 @@ bool CamraOperate::getImage()
 
 bool CamraOperate::detectionSrv()
 {
-    VBDetectionSrv.request.objectName = "";
-    VBDetectionSrv.request.detectorName = "";
+    VBDetectionSrv.request.objectName = "CambriconYoloDetector";
+    VBDetectionSrv.request.detectorName = "CambriconYoloDetector";
     VBDetectionSrv.request.detectorType = 1;
     VBDetectionSrv.request.detectorConfig = "";
-    if(clientDetection.call(VBDetectionSrv) == 0)
+    clientDetection.call(VBDetectionSrv);
+    if(VBDetectionSrv.response.result != 0)
     {
         return false;
     }
@@ -80,6 +88,7 @@ bool CamraOperate::sendtImage()
         ROS_ERROR("无图像");
         return false;
     }
+
     int ret = Calib2D->SetCalibImage(colorImg);
 
     return ret == 0 ? true : false;
@@ -103,12 +112,16 @@ void CamraOperate::getImage_callback(const sensor_msgs::ImageConstPtr &msg)
 
 void CamraOperate::getObjectArray_callback(const vision_bridge::ObjectArray::ConstPtr &msg)
 {
+    std::cout<<"getObjectArray"<<std::endl;
     if(msg->objects.size() <= 0)
     {
+        std::cout<<"1111111"<<std::endl;
         return;
     }
+    std::cout<<"2222222222"<<std::endl;
     resultPose = msg->objects[0].pose.pose;
     send(resultPose);
+    std::cout<<"33333333"<<std::endl;
     return;
 }
 

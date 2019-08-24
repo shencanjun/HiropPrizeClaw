@@ -7,8 +7,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    qRegisterMetaType<geometry_msgs::Pose>("geometry_msgs::Pose");
+
     progName = "HIROP.PRG";
-    camImageFileName ="./show.png";
+    camImageFileName ="/home/fshs/show.png";
     camXmlFileName = "./calibrate.xml";
     isDetesion = false;
     HscStatus = true;
@@ -49,6 +51,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButton_getImg, &QPushButton::clicked, this, &MainWindow::camGetImageBnt);
     connect(ui->pushButton_detesion, &QPushButton::clicked, this, &MainWindow::detesionBnt);
     connect(ui->pushButton_PrizeClaw, &QPushButton::clicked, this, &MainWindow::startMaulModeBnt);
+
+    showImageTimer->start(1.0);
+    camOpera->startCamraService();
 }
 
 MainWindow::~MainWindow()
@@ -427,7 +432,6 @@ void MainWindow::connectCamraBnt()
 {
     if(ui->pushButton_openCam->text() == "打开相机"){
         if(camOpera->connectCamra()){
-            camOpera->startCamraService();
             ui->pushButton_openCam->setText("关闭相机");
             setReturnStrtoUI("<font color = green> 打开相机成功!!! </font>");
         }
@@ -482,6 +486,7 @@ void MainWindow::detesionBnt()
     sleep(1.0);
 
     if(!isDetesion){
+        std::cout<< "识别失败："<<isDetesion<<std::endl;
         setReturnStrtoUI("<font color = red> 识别娃娃失败!!! </font>");
         return;
     }
@@ -509,6 +514,8 @@ void MainWindow::detesionBnt()
 
 void MainWindow::getCamPose(geometry_msgs::Pose pose)
 {
+    setReturnStrtoUI("<font color = green> getCamPose!!! </font>");
+    std::cout<<"32132131231231231"<<std::endl;
     //１，识别成功　０，识别失败
     isDetesion = static_cast<bool>(pose.position.z);
 
