@@ -5,6 +5,7 @@ CamraOperate::CamraOperate(ros::NodeHandle n)
     n_camra = n;
     Calib2D = new EyeCalib2D();
     clientCamra = n_camra.serviceClient<hkcamera_bridge::HkCameraData>("HkCameraData");
+    clientDetection = n_camra.serviceClient<vision_bridge::detection>("detection");
 }
 
 CamraOperate::~CamraOperate()
@@ -60,8 +61,25 @@ bool CamraOperate::getImage()
     return true;
 }
 
+bool CamraOperate::detectionSrv()
+{
+    VBDetectionSrv.request.objectName = "";
+    VBDetectionSrv.request.detectorName = "";
+    VBDetectionSrv.request.detectorType = 1;
+    VBDetectionSrv.request.detectorConfig = "";
+    if(clientDetection.call(VBDetectionSrv) == 0)
+    {
+        return false;
+    }
+    return true;
+}
+
 bool CamraOperate::sendtImage()
 {
+    if(colorImg.empty()){
+        ROS_ERROR("无图像");
+        return false;
+    }
     int ret = Calib2D->SetCalibImage(colorImg);
 
     return ret == 0 ? true : false;
@@ -96,9 +114,9 @@ void CamraOperate::getObjectArray_callback(const vision_bridge::ObjectArray::Con
 
 bool CamraOperate::startEyeCalirating()
 {
-    int ret = Calib2D->SetCalibImage(colorImg);
+    sendtImage();
 
-    return ret == 0 ? true : false;
+    return true;
 }
 
 bool CamraOperate::readEyeData(float &cx, float &cy, float &rx, float &ry, int num)
@@ -142,3 +160,18 @@ bool CamraOperate::getDetesionResult(int x, int y, std::vector<double> &pose)
     ret = Calib2D->getAffineResult(x, y, pose);
     return ret == 0 ? true : false;
 }
+
+bool CamraOperate::opencvDrawing(int x, int y, int wide, int high)
+{
+    try{
+        cv::Rect rect(x,y,wide,high);
+        cv::rectangle(colorImg,rect,cv::Scalar(255, 0, 0),1,cv::LINE_8,0);
+        cv::imwrite(imgFileName,colorImg);
+    }catch(cv::Exception &e){
+        ROS_ERROR("opencv exception: %s", e.what());
+        return false;
+    }
+    return true;
+}
+
+

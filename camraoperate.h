@@ -12,6 +12,7 @@
 #include <opencv2/opencv.hpp>
 #include <Calibration.h>
 #include <geometry_msgs/Pose.h>
+#include <vision_bridge/detection.h>
 
 class CamraOperate : public QObject
 {
@@ -45,10 +46,14 @@ public:
 
     bool getDetesionResult(int x, int y, std::vector<double> &pose);
 
+    bool opencvDrawing(int x, int y, int wide, int high);
+
+    bool detectionSrv();
+
 private:
     void getImage_callback(const sensor_msgs::ImageConstPtr &msg);
 
-    void getObjectArray_callback(const vision_bridge::ObjectArray::ConstPtr &msg);
+    void getObjectArray_callback(const vision_bridge::ObjectArray::ConstPtr &msg);\
 
 public:
     void send(geometry_msgs::Pose pose) const{
@@ -61,19 +66,18 @@ signals:
 public:
     std::string imgFileName;
     std::string camCalibXmlFileName;
+    cv::Mat colorImg;
 
 private:
     ros::NodeHandle n_camra;
     ros::Subscriber subImage;
     ros::Subscriber subPose;
     ros::ServiceClient clientCamra;
+    ros::ServiceClient clientDetection;
     hkcamera_bridge::HkCameraData hkCamraSrv;
+    vision_bridge::detection VBDetectionSrv;
 
     cv_bridge::CvImagePtr color_ptr;
-    cv::Mat colorImg;
-
-    //vision_bridge::ObjectArray objectArray;
-    //vision_bridge::ObjectInfo objectInfo;
     geometry_msgs::Pose resultPose;
 
     EyeCalib2D *Calib2D;

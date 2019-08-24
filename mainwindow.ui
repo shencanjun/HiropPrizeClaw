@@ -1094,10 +1094,28 @@ QWidget:focus{outline: none;}</string>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
+  <tabstop>lineEdit_rip</tabstop>
+  <tabstop>lineEdit_rport</tabstop>
+  <tabstop>pushButton_connectRobot</tabstop>
   <tabstop>pushButton_ebnable</tabstop>
+  <tabstop>pushButton_Load</tabstop>
   <tabstop>pushButton_start</tabstop>
+  <tabstop>pushButton_clearFault</tabstop>
   <tabstop>pushButton_VoiceRecognition</tabstop>
+  <tabstop>pushButton_PrizeClaw</tabstop>
   <tabstop>VoiceRecognition_ReSponseTxt</tabstop>
+  <tabstop>lineEdit_Msg</tabstop>
+  <tabstop>lineEdit_result_A</tabstop>
+  <tabstop>lineEdit_result_X</tabstop>
+  <tabstop>lineEdit_result_Y</tabstop>
+  <tabstop>lineEdit_result_B</tabstop>
+  <tabstop>lineEdit_result_Z</tabstop>
+  <tabstop>lineEdit_result_C</tabstop>
+  <tabstop>pushButton_detesion</tabstop>
+  <tabstop>pushButton_result_set</tabstop>
+  <tabstop>pushButton_openCam</tabstop>
+  <tabstop>pushButton_takePirture</tabstop>
+  <tabstop>pushButton_getImg</tabstop>
  </tabstops>
  <resources/>
  <connections/>

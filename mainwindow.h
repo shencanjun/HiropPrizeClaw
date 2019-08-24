@@ -38,13 +38,13 @@ private:
     std::string camXmlFileName;
     std::string progName;
     bool HscStatus;
-    double camX;
-    double camY;
-    double isDetesion;
-    double squareX;
-    double squareY;
-    double squareWidth;
-    double squareHeigth;
+    int camX;
+    int camY;
+    bool isDetesion;
+    int squareX;
+    int squareY;
+    int squareWidth;
+    int squareHeigth;
     std::vector<double> detesionRPose;
 
 public:
@@ -99,6 +99,8 @@ public:
     void startMaulModeBnt();
 
     void startMove();
+
+    void LabelDisplayMat(QLabel *label, cv::Mat &mat);
 };
 
 #endif // MAINWINDOW_H

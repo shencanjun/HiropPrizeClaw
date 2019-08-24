@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     progName = "HIROP.PRG";
     camImageFileName ="./show.png";
     camXmlFileName = "./calibrate.xml";
-    isDetesion = 0.0;
+    isDetesion = false;
     HscStatus = true;
     calDialog = new CalibrateDialog();
     calDialog->setWindowTitle("标定");
@@ -376,7 +376,9 @@ void MainWindow::showImagelabel()
     imageFileName = QFileDialog::getOpenFileName(this,"打开图片","","Image (*.png *.bmp *.jpg *.tif *.GIF )");
     if(imageFileName.isEmpty())
         return;
-    //imp.load(imageFileName);
+
+    /*
+    imp.load(imageFileName);
     if(!(imp.load(imageFileName)))
     {
         {
@@ -386,11 +388,15 @@ void MainWindow::showImagelabel()
              delete &imp;
              return;
          }
-    }
+    }*/
 
+    std::string path = imageFileName.toStdString();
+
+    camOpera->colorImg = cv::imread(path);
 
     showImageTimer->start();
 
+/*
 //    QPixmap nimp = imp.scaled(ui->label_show_image->width(),ui->label_show_image->height());
 
 //    QPainter painter(this);
@@ -398,19 +404,23 @@ void MainWindow::showImagelabel()
 //    painter.drawPixmap(0,0,nimp);
 
 //    ui->label_show_image->setPixmap(nimp);
+*/
+
+    //LabelDisplayMat(ui->label_show_image,camOpera->colorImg);
     return;
 }
 
 void MainWindow::showImageLabelChange()
 {
-    if(&imp == NULL)
-        return;
+    /*
     QPixmap nimp = imp.scaled(ui->label_show_image->width(),ui->label_show_image->height());
     QPainter painter(this);
 
     painter.drawPixmap(0,0,nimp);
 
-    ui->label_show_image->setPixmap(nimp);
+    ui->label_show_image->setPixmap(nimp);*/
+
+    LabelDisplayMat(ui->label_show_image,camOpera->colorImg);
 }
 
 void MainWindow::connectCamraBnt()
@@ -466,7 +476,12 @@ void MainWindow::detesionBnt()
     if(!camOpera->getImage())
         return;
 
-    if(isDetesion == 0.0){
+    if(!camOpera->detectionSrv())
+        return;
+
+    sleep(1.0);
+
+    if(!isDetesion){
         setReturnStrtoUI("<font color = red> 识别娃娃失败!!! </font>");
         return;
     }
@@ -495,17 +510,21 @@ void MainWindow::detesionBnt()
 void MainWindow::getCamPose(geometry_msgs::Pose pose)
 {
     //１，识别成功　０，识别失败
-    isDetesion = pose.position.z;
+    isDetesion = static_cast<bool>(pose.position.z);
 
     //识别的相机坐标
-    camX = pose.position.x;
-    camY = pose.position.y;
+    camX = static_cast<int>(pose.position.x);
+    camY = static_cast<int>(pose.position.y);
 
     //画框尺寸
-    squareX = pose.orientation.w;
-    squareY = pose.orientation.x;
-    squareWidth = pose.orientation.y;
-    squareHeigth = pose.orientation.z;
+    squareX = static_cast<int>(pose.orientation.w);
+    squareY = static_cast<int>(pose.orientation.x);
+    squareWidth = static_cast<int>(pose.orientation.y);
+    squareHeigth = static_cast<int>(pose.orientation.z);
+
+    if(isDetesion)
+        if(!camOpera->opencvDrawing(squareX,squareY,squareWidth,squareHeigth))
+            return;
 
     return;
 }
@@ -553,5 +572,30 @@ void MainWindow::startMaulModeBnt()
 {
     moveTimer->start(1);
     return;
+}
+
+void MainWindow::LabelDisplayMat(QLabel *label, cv::Mat &mat)
+{
+    cv::Mat Rgb;
+    //cv::Mat dat;
+    QImage Img;
+    //cv::resize(mat, dat, cv::Size(label->width(), label->height()), (0, 0), (0, 0), cv::INTER_LINEAR);
+    if (mat.channels() == 3)//RGB Img
+    {
+        cv::cvtColor(mat, Rgb, CV_BGR2RGB);//颜色空间转换
+        Img = QImage((const uchar*)(Rgb.data), Rgb.cols, Rgb.rows, Rgb.cols * Rgb.channels(), QImage::Format_RGB888);
+    }
+    else//Gray Img
+    {
+        Img = QImage((const uchar*)(mat.data), mat.cols, mat.rows, mat.cols*mat.channels(), QImage::Format_Indexed8);
+    }
+
+    QPixmap qimp = QPixmap::fromImage(Img);
+    QPixmap nimp = qimp.scaled(label->width(),label->height());
+    QPainter painter(this);
+
+    painter.drawPixmap(0,0,nimp);
+
+    label->setPixmap(nimp);
 }
 
