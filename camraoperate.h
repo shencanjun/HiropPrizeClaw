@@ -4,6 +4,7 @@
 #include <QObject>
 #include <ros/ros.h>
 #include <QMetaType>
+#include <QLabel>
 #include <hkcamera_bridge/HkCameraData.h>
 #include <sensor_msgs/Image.h>
 #include <vision_bridge/ObjectArray.h>
@@ -25,7 +26,7 @@ public:
 
     void startCamraService();
 
-    bool connectCamra();
+    int connectCamra();
 
     bool takePicture();
 
@@ -54,15 +55,20 @@ public:
 private:
     void getImage_callback(const sensor_msgs::ImageConstPtr &msg);
 
-    void getObjectArray_callback(const vision_bridge::ObjectArray::ConstPtr &msg);\
+    void getObjectArray_callback(const vision_bridge::ObjectArray::ConstPtr &msg);
 
 public:
     void send(geometry_msgs::Pose pose) const{
         emit emitResultCam(pose);
     }
 
+    void sendImage() const{
+        emit emitImagesignal();
+    }
+
 signals:
     void emitResultCam(geometry_msgs::Pose) const;
+    void emitImagesignal(void) const;
 
 public:
     std::string imgFileName;

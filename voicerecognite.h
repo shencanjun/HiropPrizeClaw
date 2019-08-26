@@ -9,6 +9,13 @@
 #include "jsoncpp/json/json.h"
 #include <boost/thread.hpp>
 
+enum ObjType{
+    DOG = 0,
+    RABBIT = 1,
+    MONKEY = 2,
+    NONE,
+};
+
 class VoiceRecognite : public QObject
 {
     Q_OBJECT

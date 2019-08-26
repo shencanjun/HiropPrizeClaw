@@ -21,17 +21,12 @@ void CamraOperate::startCamraService()
     return;
 }
 
-bool CamraOperate::connectCamra()
+int CamraOperate::connectCamra()
 {
     hkCamraSrv.request.cmd = 1;
     clientCamra.call(hkCamraSrv);
-    if(hkCamraSrv.response.result != 0)
-    {      
-        std::cout<<hkCamraSrv.response.result<<std::endl;
-        return false;
-    }
     std::cout<<hkCamraSrv.response.result<<std::endl;
-    return true;
+    return hkCamraSrv.response.result;
 }
 
 bool CamraOperate::disconnectCamra()
@@ -102,6 +97,7 @@ void CamraOperate::getImage_callback(const sensor_msgs::ImageConstPtr &msg)
         color_ptr = cv_bridge::toCvCopy(msg, "bgr8");
         colorImg = color_ptr->image;
         cv::imwrite(imgFileName,colorImg);
+        sendImage();
     }
     catch (cv_bridge::Exception& e)
     {

@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     progName = "HIROP.PRG";
     camImageFileName ="/home/fshs/show.png";
     camXmlFileName = "./calibrate.xml";
+    objType = DOG;
     isDetesion = false;
     HscStatus = true;
     calDialog = new CalibrateDialog();
@@ -31,9 +32,10 @@ MainWindow::MainWindow(QWidget *parent) :
     //连接信号槽
     connect(voice,&VoiceRecognite::emitResultStr,this,&MainWindow::showVoiceRecognitionResult);
     connect(camOpera, &CamraOperate::emitResultCam, this, &MainWindow::getCamPose);
+    connect(camOpera, &CamraOperate::emitImagesignal, this, &MainWindow::showImagelabel);
 
     connect(getLocTimer, &QTimer::timeout, this, &MainWindow::showHsrLocOnTime);
-    connect(showImageTimer, &QTimer::timeout, this, &MainWindow::showImageLabelChange);
+    connect(showImageTimer, &QTimer::timeout, this, &MainWindow::setFrameInCenter);
     connect(moveTimer, &QTimer::timeout, this, &MainWindow::startMove);
     connect(getHscMsgTimer, &QTimer::timeout, this, &MainWindow::HscMsgStatusLET);
 
@@ -48,11 +50,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionOpenImage, &QAction::triggered, this, &MainWindow::showImagelabel);
     connect(ui->pushButton_openCam, &QPushButton::clicked, this, &MainWindow::connectCamraBnt);
     connect(ui->pushButton_takePirture, &QPushButton::clicked, this, &MainWindow::camTakePirtureBnt);
-    connect(ui->pushButton_getImg, &QPushButton::clicked, this, &MainWindow::camGetImageBnt);
     connect(ui->pushButton_detesion, &QPushButton::clicked, this, &MainWindow::detesionBnt);
     connect(ui->pushButton_PrizeClaw, &QPushButton::clicked, this, &MainWindow::startMaulModeBnt);
+    connect(ui->comboBox_object, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::selectObjCombobox);
+    //connect(ui->comboBox_object,SIGNAL(currentIndexChanged(int)),this,SLOT(selectObjCombobox(int)));
 
-    showImageTimer->start(1.0);
+    showImageTimer->start(300);
     camOpera->startCamraService();
 }
 
@@ -152,8 +155,8 @@ void MainWindow::connectHsRobotBnt()
             ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(85, 255, 127)");
             ui->lineEdit_rip->setReadOnly(true);
             ui->lineEdit_rport->setReadOnly(true);
-            getLocTimer->start(1.0);
-            getHscMsgTimer->start(1.0);
+            getLocTimer->start(100);
+            getHscMsgTimer->start(100);
             sleep(1);
             initRobot();
             setReturnStrtoUI("<font color = green> 连接机器人成功！！！</font>");
@@ -382,48 +385,24 @@ void MainWindow::showImagelabel()
     if(imageFileName.isEmpty())
         return;
 
-    /*
-    imp.load(imageFileName);
-    if(!(imp.load(imageFileName)))
-    {
-        {
-             QMessageBox::information(this,
-                                             tr("打开图像失败"),
-                                             tr("打开图像失败!"));
-             delete &imp;
-             return;
-         }
-    }*/
-
     std::string path = imageFileName.toStdString();
 
     camOpera->colorImg = cv::imread(path);
 
-    showImageTimer->start();
+    //showImageTimer->start();
 
-/*
-//    QPixmap nimp = imp.scaled(ui->label_show_image->width(),ui->label_show_image->height());
-
-//    QPainter painter(this);
-
-//    painter.drawPixmap(0,0,nimp);
-
-//    ui->label_show_image->setPixmap(nimp);
-*/
+    //ui->label_show_image->clear();
 
     //LabelDisplayMat(ui->label_show_image,camOpera->colorImg);
+
+    showImageLabelChange();
+
     return;
 }
 
 void MainWindow::showImageLabelChange()
 {
-    /*
-    QPixmap nimp = imp.scaled(ui->label_show_image->width(),ui->label_show_image->height());
-    QPainter painter(this);
-
-    painter.drawPixmap(0,0,nimp);
-
-    ui->label_show_image->setPixmap(nimp);*/
+    ui->label_show_image->clear();
 
     LabelDisplayMat(ui->label_show_image,camOpera->colorImg);
 }
@@ -431,9 +410,13 @@ void MainWindow::showImageLabelChange()
 void MainWindow::connectCamraBnt()
 {
     if(ui->pushButton_openCam->text() == "打开相机"){
-        if(camOpera->connectCamra()){
+        if(camOpera->connectCamra() == 0){
             ui->pushButton_openCam->setText("关闭相机");
             setReturnStrtoUI("<font color = green> 打开相机成功!!! </font>");
+        }
+        else if(camOpera->connectCamra() == -2){
+            ui->pushButton_openCam->setText("关闭相机");
+            setReturnStrtoUI("<font color = green> 相机已经打开!!! </font>");
         }
         else {
             setReturnStrtoUI("<font color = red> 打开相机失败!!! </font>");
@@ -452,19 +435,23 @@ void MainWindow::connectCamraBnt()
 
 void MainWindow::camTakePirtureBnt()
 {
-    if(!camOpera->takePicture())
-    {
+    if(!camOpera->takePicture()){
         setReturnStrtoUI("<font color = red> 相机拍照失败!!! </font>");
         return;
     }
     setReturnStrtoUI("<font color = green> 相机拍照成功!!! </font>");
+
+    if(!camOpera->getImage()){
+        setReturnStrtoUI("<font color = red> 获取图像!!! </font>");
+        return;
+    }
+    setReturnStrtoUI("<font color = green> 获取图像!!! </font>");
     return;
 }
 
 void MainWindow::camGetImageBnt()
 {
-    if(!camOpera->getImage())
-    {
+    if(!camOpera->getImage()){
         setReturnStrtoUI("<font color = red> 获取图像!!! </font>");
         return;
     }
@@ -577,16 +564,35 @@ void MainWindow::startMove()
 
 void MainWindow::startMaulModeBnt()
 {
-    moveTimer->start(1);
+    moveTimer->start(100);
     return;
+}
+
+void MainWindow::selectObjCombobox(int index)
+{
+    switch (index) {
+    case 0:
+        objType = DOG;
+        setReturnStrtoUI("<font color = green > 选择小狗狗 </font>");
+        break;
+    case 1:
+        objType = RABBIT;
+        setReturnStrtoUI("<font color = green > 选择小兔兔 </font>");
+        break;
+    case 2:
+        objType = MONKEY;
+        setReturnStrtoUI("<font color = green > 选择小猴子 </font>");
+        break;
+    default:
+        objType = NONE;
+        break;
+    }
 }
 
 void MainWindow::LabelDisplayMat(QLabel *label, cv::Mat &mat)
 {
     cv::Mat Rgb;
-    //cv::Mat dat;
     QImage Img;
-    //cv::resize(mat, dat, cv::Size(label->width(), label->height()), (0, 0), (0, 0), cv::INTER_LINEAR);
     if (mat.channels() == 3)//RGB Img
     {
         cv::cvtColor(mat, Rgb, CV_BGR2RGB);//颜色空间转换
@@ -597,12 +603,39 @@ void MainWindow::LabelDisplayMat(QLabel *label, cv::Mat &mat)
         Img = QImage((const uchar*)(mat.data), mat.cols, mat.rows, mat.cols*mat.channels(), QImage::Format_Indexed8);
     }
 
-    QPixmap qimp = QPixmap::fromImage(Img);
-    QPixmap nimp = qimp.scaled(label->width(),label->height());
-    QPainter painter(this);
+    label->setScaledContents(true) ;
+    QSize qs = label->rect().size();
 
-    painter.drawPixmap(0,0,nimp);
+    QPixmap qimp = QPixmap::fromImage(Img);
+    QPixmap nimp = qimp.scaled(qs);
 
     label->setPixmap(nimp);
 }
 
+void MainWindow::setFrameInCenter()
+{
+    int h = 30;
+
+    int gw = ui->groupBox_vision->geometry().width();
+    int gh = ui->groupBox_vision->geometry().height();
+
+    int fw = ui->frame_vision->geometry().width();
+    int fh = ui->frame_vision->geometry().height();
+
+    int fx = (gw - fw) / 2;
+    int fy = (gh - fh) / 2;
+
+    fy = h;
+    fh = gh - (h*2) + 10;
+
+    std::cout<<"gw:" <<gw<<std::endl
+              <<"gh:" <<gh<<std::endl
+              <<"fw:" <<fw <<std::endl
+              <<"fh:" <<fh <<std::endl
+              <<"fx:" <<fx <<std::endl
+              <<"fy:" <<fy <<std::endl;
+
+    ui->frame_vision->setGeometry(fx,fy,fw,fh);
+
+    return;
+}

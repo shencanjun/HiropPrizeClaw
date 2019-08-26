@@ -46,6 +46,7 @@ private:
     int squareWidth;
     int squareHeigth;
     std::vector<double> detesionRPose;
+    ObjType objType;
 
 public:
     HSC3ROBOT *hsc3;
@@ -100,7 +101,11 @@ public:
 
     void startMove();
 
+    void selectObjCombobox(int index);
+
     void LabelDisplayMat(QLabel *label, cv::Mat &mat);
+
+    void setFrameInCenter();
 };
 
 #endif // MAINWINDOW_H
