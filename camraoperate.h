@@ -40,9 +40,9 @@ public:
 
     bool writeCalibrateData(float rx, float ry, int num);
 
-    bool readEyeData(float &cx, float &cy,float &rx, float &ry, int num);
+    bool readEyeData(float &cx, float &cy, int num);
 
-    bool getCalibrateResult(double accu);
+    bool getCalibrateResult(double &accu);
 
     bool readClibrateData();
 
@@ -51,6 +51,8 @@ public:
     bool opencvDrawing(int x, int y, int wide, int high);
 
     bool detectionSrv();
+
+    bool getCalibrateImage();
 
 private:
     void getImage_callback(const sensor_msgs::ImageConstPtr &msg);
@@ -62,18 +64,19 @@ public:
         emit emitResultCam(pose);
     }
 
-    void sendImage() const{
-        emit emitImagesignal();
+    void sendImage(cv::Mat mat) const{
+        emit emitImagesignal(mat);
     }
 
 signals:
     void emitResultCam(geometry_msgs::Pose) const;
-    void emitImagesignal(void) const;
+    void emitImagesignal(cv::Mat) const;
 
 public:
     std::string imgFileName;
     std::string camCalibXmlFileName;
     cv::Mat colorImg;
+    cv::Mat calibrateImage;
 
 private:
     ros::NodeHandle n_camra;

@@ -77,6 +77,13 @@ bool CamraOperate::detectionSrv()
     return true;
 }
 
+bool CamraOperate::getCalibrateImage()
+{
+    Calib2D->getEyeCalibImage(calibrateImage);
+    sendImage(calibrateImage);
+    return true;
+}
+
 bool CamraOperate::sendtImage()
 {
     if(colorImg.empty()){
@@ -97,7 +104,7 @@ void CamraOperate::getImage_callback(const sensor_msgs::ImageConstPtr &msg)
         color_ptr = cv_bridge::toCvCopy(msg, "bgr8");
         colorImg = color_ptr->image;
         cv::imwrite(imgFileName,colorImg);
-        sendImage();
+        sendImage(colorImg);
     }
     catch (cv_bridge::Exception& e)
     {
@@ -110,9 +117,7 @@ void CamraOperate::getObjectArray_callback(const vision_bridge::ObjectArray::Con
 {
     std::cout<<"getObjectArray"<<std::endl;
     if(msg->objects.size() <= 0)
-    {
         return;
-    }
     resultPose = msg->objects[0].pose.pose;
     send(resultPose);
     return;
@@ -125,17 +130,15 @@ bool CamraOperate::startEyeCalirating()
     return true;
 }
 
-bool CamraOperate::readEyeData(float &cx, float &cy, float &rx, float &ry, int num)
+bool CamraOperate::readEyeData(float &cx, float &cy, int num)
 {
     int ret = -1;
     std::vector<float> camVec;
-    ret = Calib2D->readEyeCalib(camVec,num);
-    if(camVec.size() <= 2 )
+    ret = Calib2D->readEyeCalibImage(camVec, num);
+    if(camVec.size() < 2)
         return false;
     cx = camVec[0];
     cy = camVec[1];
-    rx = camVec[3];
-    ry = camVec[4];
     return ret == 0 ? true : false;
 }
 
@@ -146,9 +149,10 @@ bool CamraOperate::writeCalibrateData(float rx, float ry, int num)
     return ret == 0 ? true : false;
 }
 
-bool CamraOperate::getCalibrateResult(double accu)
+bool CamraOperate::getCalibrateResult(double &accu)
 {
     int ret = -1;
+    std::cout<<"camCalibXmlFileName:"<<camCalibXmlFileName<<std::endl;
     ret = Calib2D->estimaHom2D(camCalibXmlFileName,accu);
     return ret == 0 ? true : false;
 }

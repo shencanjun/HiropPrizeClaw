@@ -14,6 +14,7 @@ CalibrateDialog::CalibrateDialog(QWidget *parent) :
     connect(action, &QAction::triggered, this, &CalibrateDialog::slotActionDelete);
     connect(ui->pushButton_startCalib, &QPushButton::clicked, this, &CalibrateDialog::startCalibration);
     connect(ui->pushButton_record,&QPushButton::clicked,this,&CalibrateDialog::recordCalibrateData);
+    connect(ui->pushButton_clibrate,&QPushButton::clicked, this, &CalibrateDialog::getCalibrationResult);
     connect(ui->tableWidget, &QTableWidget::customContextMenuRequested, this, &CalibrateDialog::on_tableWidget_customContextMenuRequested);
 }
 
@@ -35,13 +36,22 @@ void CalibrateDialog::startCalibration()
     {
         QMessageBox::warning(NULL, "提示", "<font color = red >开始标定失败!!!</font>", QMessageBox::Yes);
     }
+
+    camCalib->getCalibrateImage();
+
+    float cx ,cy;
+    for(int i=0;i<9;i++)
+    {
+        camCalib->readEyeData(cx, cy, i);
+        ui->tableWidget->setItem(i, cColumnX, new QTableWidgetItem(QString::number(cx, 'f', 4)));
+        ui->tableWidget->setItem(i, cColumnY, new QTableWidgetItem(QString::number(cy, 'f', 4)));
+    }
     return;
 }
 
 void CalibrateDialog::recordCalibrateData()
 {
     LocData data;
-    std::vector<float> eyeCalib;
     if(!Chsc3->getHscLoc(data)){
         std::cout<<"获取机器人笛卡尔坐标失败！！！"<<std::endl;
         QMessageBox::warning(NULL, "提示", "<font color = red >获取机器人笛卡尔坐标失败！！！</font>", QMessageBox::Yes);
@@ -58,16 +68,10 @@ void CalibrateDialog::recordCalibrateData()
     {
         return;
     }
+    //std::cout<<"raw:" <<raw<<std::endl;
 
-    float cx, cy, rx, ry;
-    if(!camCalib->readEyeData(cx, cy, rx, ry, raw))
-    {
-        return;
-    }
-    ui->tableWidget->setItem(raw, cColumnX, new QTableWidgetItem(QString::number(cx, 'f', 4)));
-    ui->tableWidget->setItem(raw, cColumnY, new QTableWidgetItem(QString::number(cy, 'f', 4)));
-    ui->tableWidget->setItem(raw, rColumnX, new QTableWidgetItem(QString::number(rx, 'f', 4)));
-    ui->tableWidget->setItem(raw, rColumnY, new QTableWidgetItem(QString::number(ry, 'f', 4)));
+    ui->tableWidget->setItem(raw, rColumnX, new QTableWidgetItem(QString::number(data[0], 'f', 4)));
+    ui->tableWidget->setItem(raw, rColumnY, new QTableWidgetItem(QString::number(data[1], 'f', 4)));
 
     raw++;
     if(raw >= 9)
@@ -83,7 +87,7 @@ void CalibrateDialog::getCalibrationResult()
     {
         QMessageBox::warning(NULL, "提示", "<font color = red >标定失败!!!</font>", QMessageBox::Yes);
     }
-
+    std::cout<<"accu :"<<accu<<std::endl;
     ui->label_accuary->setText(QString::number(accu, 'f', 4));
     return;
 }

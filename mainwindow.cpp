@@ -8,10 +8,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     qRegisterMetaType<geometry_msgs::Pose>("geometry_msgs::Pose");
+    qRegisterMetaType<cv::Mat>("cv::Mat");
 
     progName = "HIROP.PRG";
-    camImageFileName ="/home/ros/show.png";
-    camXmlFileName = "/home/ros/config.xml";
+    camImageFileName ="/home/fshs/show.jpg";
+    camXmlFileName = "calibrate";
     objType = DOG;
     isDetesion = false;
     HscStatus = true;
@@ -32,12 +33,12 @@ MainWindow::MainWindow(QWidget *parent) :
     //连接信号槽
     connect(voice,&VoiceRecognite::emitResultStr,this,&MainWindow::showVoiceRecognitionResult);
     connect(camOpera, &CamraOperate::emitResultCam, this, &MainWindow::getCamPose);
-    connect(camOpera, &CamraOperate::emitImagesignal, this, &MainWindow::showImagelabel);
+    connect(camOpera, &CamraOperate::emitImagesignal, this, &MainWindow::showImageLabelChange);
 
     connect(getLocTimer, &QTimer::timeout, this, &MainWindow::showHsrLocOnTime);
     connect(showgroupTimer, &QTimer::timeout, this, &MainWindow::setFrameInCenter);
     connect(moveTimer, &QTimer::timeout, this, &MainWindow::startMove);
-    connect(getHscMsgTimer, &QTimer::timeout, this, &MainWindow::HscMsgStatusLET);
+    //connect(getHscMsgTimer, &QTimer::timeout, this, &MainWindow::HscMsgStatusLET);
 
     connect(ui->actionCalibrate,&QAction::triggered,this,&MainWindow::showClibrateDialog);
     connect(ui->pushButton_VoiceRecognition,&QPushButton::clicked,this,&MainWindow::OpenOrCloseVoiceRecognitionBnt);
@@ -343,7 +344,7 @@ void MainWindow::HscMsgStatusLET()
 
     if(!hsc3->getFaultMessage(level,msg))
     {
-        setReturnStrtoUI("<font color = red> 获取机器人报警！！！ </font>");
+        //setReturnStrtoUI("<font color = red> 获取机器人报警！！！ </font>");
         return;
     }
     qstr = QString::fromStdString(msg);
@@ -395,7 +396,7 @@ void MainWindow::showImagelabel()
     return;
 }
 
-void MainWindow::showImageLabelChange(cv::Mat &draw)
+void MainWindow::showImageLabelChange(cv::Mat draw)
 {
     ui->label_show_image->clear();
 
@@ -498,8 +499,6 @@ void MainWindow::detesionBnt()
 
 void MainWindow::getCamPose(geometry_msgs::Pose pose)
 {
-    setReturnStrtoUI("<font color = green> getCamPose!!! </font>");
-    std::cout<<"32132131231231231"<<std::endl;
     //１，识别成功　０，识别失败
     isDetesion = static_cast<bool>(pose.position.z);
 
@@ -630,12 +629,12 @@ void MainWindow::setFrameInCenter()
     fy = h;
     fh = gh - (h*2) + 10;
 
-    std::cout<<"gw:" <<gw<<std::endl
-              <<"gh:" <<gh<<std::endl
-              <<"fw:" <<fw <<std::endl
-              <<"fh:" <<fh <<std::endl
-              <<"fx:" <<fx <<std::endl
-              <<"fy:" <<fy <<std::endl;
+//    std::cout<<"gw:" <<gw<<std::endl
+//              <<"gh:" <<gh<<std::endl
+//              <<"fw:" <<fw <<std::endl
+//              <<"fh:" <<fh <<std::endl
+//              <<"fx:" <<fx <<std::endl
+//              <<"fy:" <<fy <<std::endl;
 
     ui->frame_vision->setGeometry(fx,fy,fw,fh);
 

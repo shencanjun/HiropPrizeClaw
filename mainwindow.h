@@ -85,7 +85,7 @@ public:
 
     void showImagelabel();
 
-    void showImageLabelChange(cv::Mat &draw);
+    void showImageLabelChange(cv::Mat draw);
 
     void connectCamraBnt();
 
