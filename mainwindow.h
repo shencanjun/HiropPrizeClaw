@@ -30,7 +30,7 @@ private:
     ros::NodeHandle n_MW;
     QTimer *getLocTimer;
     QTimer *getHscMsgTimer;
-    QTimer *showImageTimer;
+    QTimer *showgroupTimer;
     QTimer *moveTimer;
     QPixmap imp;
     QString imageFileName;
@@ -85,7 +85,7 @@ public:
 
     void showImagelabel();
 
-    void showImageLabelChange();
+    void showImageLabelChange(cv::Mat &draw);
 
     void connectCamraBnt();
 

@@ -10,8 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
     qRegisterMetaType<geometry_msgs::Pose>("geometry_msgs::Pose");
 
     progName = "HIROP.PRG";
-    camImageFileName ="/home/fshs/show.png";
-    camXmlFileName = "./calibrate.xml";
+    camImageFileName ="/home/ros/show.png";
+    camXmlFileName = "/home/ros/config.xml";
     objType = DOG;
     isDetesion = false;
     HscStatus = true;
@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     getLocTimer = new QTimer(this);
     getHscMsgTimer = new QTimer(this);
-    showImageTimer = new QTimer(this);
+    showgroupTimer = new QTimer(this);
     moveTimer = new QTimer(this);
 
     //连接信号槽
@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(camOpera, &CamraOperate::emitImagesignal, this, &MainWindow::showImagelabel);
 
     connect(getLocTimer, &QTimer::timeout, this, &MainWindow::showHsrLocOnTime);
-    connect(showImageTimer, &QTimer::timeout, this, &MainWindow::setFrameInCenter);
+    connect(showgroupTimer, &QTimer::timeout, this, &MainWindow::setFrameInCenter);
     connect(moveTimer, &QTimer::timeout, this, &MainWindow::startMove);
     connect(getHscMsgTimer, &QTimer::timeout, this, &MainWindow::HscMsgStatusLET);
 
@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->comboBox_object, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::selectObjCombobox);
     //connect(ui->comboBox_object,SIGNAL(currentIndexChanged(int)),this,SLOT(selectObjCombobox(int)));
 
-    showImageTimer->start(300);
+    showgroupTimer->start(300);
     camOpera->startCamraService();
 }
 
@@ -368,6 +368,9 @@ void MainWindow::HscMsgStatusLET()
 
 void MainWindow::HscClearFaultBnt()
 {
+    //camOpera->opencvDrawing(20,20,100,200);
+    //cv::Mat darw = cv::imread(camImageFileName);
+    //showImageLabelChange(darw);
     if(!hsc3->HscClearFault())
     {
         setReturnStrtoUI("<font color = red> 机器人复位失败！！！ </font>");
@@ -379,8 +382,6 @@ void MainWindow::HscClearFaultBnt()
 
 void MainWindow::showImagelabel()
 {
-    //QImage *img = new QImage();
-    showImageTimer->stop();
     imageFileName = QFileDialog::getOpenFileName(this,"打开图片","","Image (*.png *.bmp *.jpg *.tif *.GIF )");
     if(imageFileName.isEmpty())
         return;
@@ -389,22 +390,18 @@ void MainWindow::showImagelabel()
 
     camOpera->colorImg = cv::imread(path);
 
-    //showImageTimer->start();
-
-    //ui->label_show_image->clear();
-
-    //LabelDisplayMat(ui->label_show_image,camOpera->colorImg);
-
-    showImageLabelChange();
+    showImageLabelChange(camOpera->colorImg);
 
     return;
 }
 
-void MainWindow::showImageLabelChange()
+void MainWindow::showImageLabelChange(cv::Mat &draw)
 {
     ui->label_show_image->clear();
 
-    LabelDisplayMat(ui->label_show_image,camOpera->colorImg);
+    LabelDisplayMat(ui->label_show_image,draw);
+
+    return;
 }
 
 void MainWindow::connectCamraBnt()
@@ -517,8 +514,11 @@ void MainWindow::getCamPose(geometry_msgs::Pose pose)
     squareHeigth = static_cast<int>(pose.orientation.z);
 
     if(isDetesion)
-        if(!camOpera->opencvDrawing(squareX,squareY,squareWidth,squareHeigth))
+        if(!camOpera->opencvDrawing(squareX,squareY,squareWidth,squareHeigth)){
+            cv::Mat darw = cv::imread(camImageFileName);
+            showImageLabelChange(darw);
             return;
+        }
 
     return;
 }
@@ -603,13 +603,15 @@ void MainWindow::LabelDisplayMat(QLabel *label, cv::Mat &mat)
         Img = QImage((const uchar*)(mat.data), mat.cols, mat.rows, mat.cols*mat.channels(), QImage::Format_Indexed8);
     }
 
-    label->setScaledContents(true) ;
+    label->setScaledContents(true);
     QSize qs = label->rect().size();
 
     QPixmap qimp = QPixmap::fromImage(Img);
     QPixmap nimp = qimp.scaled(qs);
 
     label->setPixmap(nimp);
+
+    return;
 }
 
 void MainWindow::setFrameInCenter()

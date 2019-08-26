@@ -111,13 +111,10 @@ void CamraOperate::getObjectArray_callback(const vision_bridge::ObjectArray::Con
     std::cout<<"getObjectArray"<<std::endl;
     if(msg->objects.size() <= 0)
     {
-        std::cout<<"1111111"<<std::endl;
         return;
     }
-    std::cout<<"2222222222"<<std::endl;
     resultPose = msg->objects[0].pose.pose;
     send(resultPose);
-    std::cout<<"33333333"<<std::endl;
     return;
 }
 
@@ -174,7 +171,7 @@ bool CamraOperate::opencvDrawing(int x, int y, int wide, int high)
 {
     try{
         cv::Rect rect(x,y,wide,high);
-        cv::rectangle(colorImg,rect,cv::Scalar(255, 0, 0),1,cv::LINE_8,0);
+        cv::rectangle(colorImg,rect,cv::Scalar(255, 0, 0),2,cv::LINE_8,0);
         cv::imwrite(imgFileName,colorImg);
     }catch(cv::Exception &e){
         ROS_ERROR("opencv exception: %s", e.what());
