@@ -9,6 +9,7 @@
 #include <vector>
 #include "hsc3robot.h"
 #include "camraoperate.h"
+#include "parseconfig.h"
 
 namespace Ui {
 class CalibrateDialog;
@@ -29,6 +30,7 @@ private:
     HSC3ROBOT *Chsc3;
     CamraOperate *camCalib;
     LocData hscLocData;
+    ParseConfig *parse;
 
     int raw;
     int column;
@@ -54,6 +56,9 @@ private:
 
 public:
     void setOpeaObject(HSC3ROBOT *MWhsc3, CamraOperate *cam);
+    void readCalibrateData();
+
+    QString calibDataFileName;
 
 };
 

@@ -13,7 +13,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/opencv.hpp>
 #include <Calibration.h>
-#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <vision_bridge/detection.h>
 
 class CamraOperate : public QObject
@@ -60,7 +60,7 @@ private:
     void getObjectArray_callback(const vision_bridge::ObjectArray::ConstPtr &msg);
 
 public:
-    void send(geometry_msgs::Pose pose) const{
+    void send(geometry_msgs::PoseStamped pose) const{
         emit emitResultCam(pose);
     }
 
@@ -69,7 +69,7 @@ public:
     }
 
 signals:
-    void emitResultCam(geometry_msgs::Pose) const;
+    void emitResultCam(geometry_msgs::PoseStamped) const;
     void emitImagesignal(cv::Mat) const;
 
 public:
@@ -88,7 +88,8 @@ private:
     vision_bridge::detection VBDetectionSrv;
 
     cv_bridge::CvImagePtr color_ptr;
-    geometry_msgs::Pose resultPose;
+    geometry_msgs::PoseStamped resultPose;
+    std::vector<geometry_msgs::PoseStamped> resultPoses;
 
     EyeCalib2D *Calib2D;
 

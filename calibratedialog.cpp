@@ -11,11 +11,14 @@ CalibrateDialog::CalibrateDialog(QWidget *parent) :
     tableMenu = new QMenu(ui->tableWidget);
     tableMenu->setStyleSheet("background-color: rgb(255, 255, 255)");
     action = new QAction("删除", this);
+    parse = new ParseConfig();
     connect(action, &QAction::triggered, this, &CalibrateDialog::slotActionDelete);
     connect(ui->pushButton_startCalib, &QPushButton::clicked, this, &CalibrateDialog::startCalibration);
     connect(ui->pushButton_record,&QPushButton::clicked,this,&CalibrateDialog::recordCalibrateData);
     connect(ui->pushButton_clibrate,&QPushButton::clicked, this, &CalibrateDialog::getCalibrationResult);
-    connect(ui->tableWidget, &QTableWidget::customContextMenuRequested, this, &CalibrateDialog::on_tableWidget_customContextMenuRequested);
+    connect(ui->tableWidget, &QTableWidget::customContextMenuRequested,
+            this, &CalibrateDialog::on_tableWidget_customContextMenuRequested);
+    connect(ui->pushButton_save, &QPushButton::clicked, this, &CalibrateDialog::SaveCalibration);
 }
 
 CalibrateDialog::~CalibrateDialog()
@@ -27,6 +30,17 @@ void CalibrateDialog::setOpeaObject(HSC3ROBOT *MWhsc3, CamraOperate *cam)
 {
     Chsc3 = MWhsc3;
     camCalib = cam;
+    return;
+}
+
+void CalibrateDialog::readCalibrateData()
+{
+    double acc, comx, comy;
+    std::cout<<"calibDataFileName:"<<calibDataFileName.toStdString()<<std::endl;
+    parse->readCalibXML(calibDataFileName,acc,comx,comy);
+    ui->label_accuary->setText(QString::number(acc,'f',4));
+    ui->lineEdit_compensateX->setText(QString::number(comx,'f',4));
+    ui->lineEdit_compensateY->setText(QString::number(comy,'f',4));
     return;
 }
 
@@ -103,6 +117,16 @@ void CalibrateDialog::on_tableWidget_customContextMenuRequested(const QPoint &po
 void CalibrateDialog::slotActionDelete()
 {
     QMessageBox::warning(NULL, "提示", "<font color = red >是否确认删除本列数据？</font>", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    return;
+}
+
+void CalibrateDialog::SaveCalibration()
+{
+    parse->writeXmlFile(calibDataFileName,
+                        ui->label_accuary->text().toDouble(),
+                        ui->lineEdit_compensateX->text().toDouble(),
+                        ui->lineEdit_compensateY->text().toDouble());
+
     return;
 }
 

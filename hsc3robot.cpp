@@ -130,5 +130,12 @@ bool HSC3ROBOT::getHscProInfo(const std::string &fileName, ProgInfo &info)
     return ret == 0 ? true : false;
 }
 
+bool HSC3ROBOT::setHscVord(int vord)
+{
+    //ret = proMotion->setJogVord();
+    ret = proMotion->setVord(vord);
+    return ret == 0 ? true : false;
+}
+
 
 

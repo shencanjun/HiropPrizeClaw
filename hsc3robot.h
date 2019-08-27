@@ -56,6 +56,8 @@ public:
 
     bool getHscProInfo(const std::string &fileName, ProgInfo &info);
 
+    bool setHscVord(int vord);
+
 protected:
 
     CommApi *comapi;

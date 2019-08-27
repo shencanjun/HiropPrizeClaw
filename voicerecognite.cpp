@@ -57,22 +57,14 @@ void VoiceRecognite::parseIntent(std::string &data)
     return;
 }
 
-void VoiceRecognite::threadIntent()
-{
-    //boost::function0< void> voiceFun = boost::bind(&VoiceRecognite::listenVoice_callback,this);
-    //thrdVoice = new boost::thread(voiceFun);
-
-    //return;
-}
-
 int VoiceRecognite::startVoiceRecognition()
 {
     hirop_msgs::StartListen startListen;
     subUserIntent = nVoice.subscribe("/user_intent",1,&VoiceRecognite::listenVoice_callback,this);
-    if(clientSatrtListener.call(startListen))
+    clientSatrtListener.call(startListen);
+    if(startListen.response.reuslt == 0)
     {
         std::cout<<"start listen succeeful!!!"<<std::endl;
-        //threadIntent();
     }
     else
     {
@@ -84,7 +76,8 @@ int VoiceRecognite::startVoiceRecognition()
 int VoiceRecognite::stopVoiceRecognition()
 {
     hirop_msgs::StopListen stopListen;
-    if(clientStopListener.call(stopListen))
+    clientStopListener.call(stopListen);
+    if(stopListen.response.reuslt == 0)
     {
         std::cout<<"stop listen succeeful!!!"<<std::endl;
     }

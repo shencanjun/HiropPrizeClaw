@@ -10,20 +10,28 @@ MainWindow::MainWindow(QWidget *parent) :
     qRegisterMetaType<geometry_msgs::Pose>("geometry_msgs::Pose");
     qRegisterMetaType<cv::Mat>("cv::Mat");
 
+    MainXmlFile = "/home/ros/HiropPrizeClaw/build-HiropPrizeClaw-unknown-Debug/MainConfig.xml";
+
     progName = "HIROP.PRG";
-    camImageFileName ="/home/fshs/show.jpg";
+    camImageFileName ="/home/ros/show.jpg";
     camXmlFileName = "calibrate";
+    calibXmlName = "/home/ros/calibrateData.xml";
     objType = DOG;
     isDetesion = false;
     HscStatus = true;
     calDialog = new CalibrateDialog();
     calDialog->setWindowTitle("标定");
+    calDialog->calibDataFileName = calibXmlName;
     voice = new VoiceRecognite(n_MW);
     hsc3 = new HSC3ROBOT();
 
     camOpera = new CamraOperate(n_MW);
-    camOpera->imgFileName = camImageFileName;
-    camOpera->camCalibXmlFileName = camXmlFileName;
+    camOpera->imgFileName = camImageFileName.toStdString();
+    camOpera->camCalibXmlFileName = camXmlFileName.toStdString();
+
+    parse = new ParseConfig();
+
+   // readMainXml();
 
     getLocTimer = new QTimer(this);
     getHscMsgTimer = new QTimer(this);
@@ -58,16 +66,38 @@ MainWindow::MainWindow(QWidget *parent) :
 
     showgroupTimer->start(300);
     camOpera->startCamraService();
+    //readRobotConfig();
 }
 
 MainWindow::~MainWindow()
 {
+    delete parse;
+    delete voice;
+    delete calDialog;
     delete ui;
 }
 
 void MainWindow::sendNodeHanle(ros::NodeHandle n)
 {
     n_MW = n;
+    return;
+}
+
+void MainWindow::readMainXml()
+{
+    QString configStr;
+    if(parse->readMainXml(MainXmlFile,"urldata","camImageFileName",configStr))
+        return;
+    std::cout<<"configStr:"<<configStr.toStdString()<<std::endl;
+    camImageFileName = configStr;
+    if(parse->readMainXml(MainXmlFile,"urldata","camXmlFileName",configStr))
+        return;
+    std::cout<<"configStr:"<<configStr.toStdString()<<std::endl;
+    camXmlFileName = configStr;
+    if(parse->readMainXml(MainXmlFile,"urldata","calibXmlName",configStr))
+        return;
+    std::cout<<"configStr:"<<configStr.toStdString()<<std::endl;
+    calibXmlName = configStr;
     return;
 }
 
@@ -81,6 +111,7 @@ void MainWindow::setReturnStrtoUI(QString str)
 void MainWindow::showClibrateDialog()
 {
     calDialog->setOpeaObject(hsc3, camOpera);
+    calDialog->readCalibrateData();
     calDialog->show();
 }
 
@@ -108,9 +139,46 @@ void MainWindow::showVoiceRecognitionResult(QString str)
     return;
 }
 
+void MainWindow::readRobotConfig()
+{
+    QString qrobotIPStr,qrobotPortStr,qrobotPrgNameStr,qrobotVordStr,qrobotIsStr;
+    if(parse->readMainXml(MainXmlFile,"robot","default_ip",qrobotIPStr))
+        robotIpStr = qrobotIPStr.toStdString();
+    if(parse->readMainXml(MainXmlFile,"robot","default_port",qrobotPortStr))
+        robotPort = qrobotPortStr.toUShort();
+    if(parse->readMainXml(MainXmlFile,"robot","progname",qrobotPrgNameStr))
+        progName = qrobotPrgNameStr.toStdString();
+    if(parse->readMainXml(MainXmlFile,"robot","speed",qrobotVordStr))
+        robotVord = qrobotVordStr.toInt();
+    if(parse->readMainXml(MainXmlFile,"robot","isconnect",qrobotIsStr)){
+        if(qrobotIsStr == "true" || qrobotIsStr == "True" || qrobotIsStr == "TRUE"){
+            if(hsc3->connectIPC(robotIpStr,robotPort))
+            {
+                ui->pushButton_connectRobot->setText("断开");
+                ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(85, 255, 127)");
+                ui->lineEdit_rip->setReadOnly(true);
+                ui->lineEdit_rport->setReadOnly(true);
+                getLocTimer->start(100);
+                getHscMsgTimer->start(100);
+                sleep(1);
+                initRobot();
+                setReturnStrtoUI("<font color = green> 连接机器人成功！！！</font>");
+            }
+            else
+            {
+                ui->lineEdit_rip->setReadOnly(false);
+                ui->lineEdit_rport->setReadOnly(false);
+                setReturnStrtoUI("<font color = red> 连接机器人失败！！！ </font>");
+            }
+        }
+    }
+    return;
+}
+
 void MainWindow::initRobot()
 {
     bool en;
+
     if(!HscStatus)
     {
         ui->lineEdit_Msg->setStyleSheet("background-color: rgb(255, 85, 0);");
@@ -145,6 +213,8 @@ void MainWindow::initRobot()
 
 void MainWindow::connectHsRobotBnt()
 {
+    calDialog->close();
+    return;
     std::string ipstr = ui->lineEdit_rip->text().toStdString();
     uint16_t port = ui->lineEdit_rport->text().toUShort();
 
@@ -497,24 +567,24 @@ void MainWindow::detesionBnt()
     return;
 }
 
-void MainWindow::getCamPose(geometry_msgs::Pose pose)
+void MainWindow::getCamPose(geometry_msgs::PoseStamped pose)
 {
     //１，识别成功　０，识别失败
-    isDetesion = static_cast<bool>(pose.position.z);
+    isDetesion = static_cast<bool>(pose.pose.position.z);
 
     //识别的相机坐标
-    camX = static_cast<int>(pose.position.x);
-    camY = static_cast<int>(pose.position.y);
+    camX = static_cast<int>(pose.pose.position.x);
+    camY = static_cast<int>(pose.pose.position.y);
 
     //画框尺寸
-    squareX = static_cast<int>(pose.orientation.w);
-    squareY = static_cast<int>(pose.orientation.x);
-    squareWidth = static_cast<int>(pose.orientation.y);
-    squareHeigth = static_cast<int>(pose.orientation.z);
+    squareX = static_cast<int>(pose.pose.orientation.w);
+    squareY = static_cast<int>(pose.pose.orientation.x);
+    squareWidth = static_cast<int>(pose.pose.orientation.y);
+    squareHeigth = static_cast<int>(pose.pose.orientation.z);
 
     if(isDetesion)
         if(!camOpera->opencvDrawing(squareX,squareY,squareWidth,squareHeigth)){
-            cv::Mat darw = cv::imread(camImageFileName);
+            cv::Mat darw = cv::imread(camImageFileName.toStdString());
             showImageLabelChange(darw);
             return;
         }
@@ -639,4 +709,20 @@ void MainWindow::setFrameInCenter()
     ui->frame_vision->setGeometry(fx,fy,fw,fh);
 
     return;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QMessageBox::StandardButton button;
+    button=QMessageBox::question(this,tr("退出程序"),QString(tr("确认退出程序")),QMessageBox::Yes|QMessageBox::No);
+    if(button==QMessageBox::No)
+    {
+        event->ignore(); // 忽略退出信号，程序继续进行
+    }
+    else if(button==QMessageBox::Yes)
+    {
+        calDialog->close();
+        event->accept(); // 接受退出信号，程序退出
+    }
+    //return;
 }

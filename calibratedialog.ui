@@ -260,8 +260,8 @@ p, li { white-space: pre-wrap; }
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>50</y>
+      <x>270</x>
+      <y>90</y>
       <width>31</width>
       <height>17</height>
      </rect>
@@ -273,8 +273,8 @@ p, li { white-space: pre-wrap; }
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>90</y>
+      <x>270</x>
+      <y>130</y>
       <width>31</width>
       <height>17</height>
      </rect>
@@ -283,62 +283,10 @@ p, li { white-space: pre-wrap; }
      <string>Y:</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>140</y>
-      <width>31</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Z:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>50</y>
-      <width>31</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>A:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_9">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>90</y>
-      <width>31</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>B:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_10">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>140</y>
-      <width>31</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>C:</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_11">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>30</x>
       <y>50</y>
       <width>71</width>
       <height>17</height>
@@ -351,8 +299,8 @@ p, li { white-space: pre-wrap; }
    <widget class="QLabel" name="label_12">
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>120</y>
+      <x>220</x>
+      <y>50</y>
       <width>71</width>
       <height>17</height>
      </rect>
@@ -361,108 +309,48 @@ p, li { white-space: pre-wrap; }
      <string>标定补偿：</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_13">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>50</y>
-      <width>67</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>0.000</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_14">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>90</y>
-      <width>67</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>0.000</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_15">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>140</y>
-      <width>67</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>0.000</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_16">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>50</y>
-      <width>67</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>0.000</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_17">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>90</y>
-      <width>67</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>0.000</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_18">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>140</y>
-      <width>67</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>0.000</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_accuary">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>50</y>
-      <width>67</width>
-      <height>17</height>
+      <x>50</x>
+      <y>100</y>
+      <width>101</width>
+      <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>18</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>0.000</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_20">
+   <widget class="QLineEdit" name="lineEdit_compensateX">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>120</y>
-      <width>67</width>
-      <height>17</height>
+      <x>310</x>
+      <y>84</y>
+      <width>111</width>
+      <height>30</height>
      </rect>
     </property>
-    <property name="text">
-     <string>0.000</string>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(238, 238, 236);</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_compensateY">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>120</y>
+      <width>113</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
    </widget>
   </widget>

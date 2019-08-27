@@ -27,7 +27,6 @@ public:
 private:
     void listenVoice_callback(const std_msgs::String::ConstPtr &msg);
     void parseIntent(std::string &data);
-    void threadIntent();
 
 public:
     void send(QString str) const{
