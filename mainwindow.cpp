@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    qRegisterMetaType<geometry_msgs::PoseStamped>("geometry_msgs::PoseStamped");
+    //qRegisterMetaType<geometry_msgs::PoseStamped>("geometry_msgs::PoseStamped");
     qRegisterMetaType<cv::Mat>("cv::Mat");
 
     MainXmlFile = "/home/fshs/HiropPrizeClaw/build-HiropPrizeClaw-unknown-Debug/MainConfig.xml";
@@ -16,8 +16,9 @@ MainWindow::MainWindow(QWidget *parent) :
     camImageFileName ="/home/fshs/show.jpg";
     camXmlFileName = "calibrate";
     calibXmlName = "/home/fshs/calibrateData.xml";
-    objType = DOG;
+    objType = BEAR;
     isDetesion = false;
+    isdone = false;
     HscStatus = true;
     calDialog = new CalibrateDialog();
     calDialog->setWindowTitle("标定");
@@ -32,21 +33,19 @@ MainWindow::MainWindow(QWidget *parent) :
     parse = new ParseConfig();
 
    // readMainXml();
-
-    getLocTimer = new QTimer(this);
     getHscMsgTimer = new QTimer(this);
     showgroupTimer = new QTimer(this);
-    moveTimer = new QTimer(this);
 
     //连接信号槽
     connect(voice,&VoiceRecognite::emitResultStr,this,&MainWindow::showVoiceRecognitionResult);
-    connect(camOpera, &CamraOperate::emitResultCam, this, &MainWindow::getCamPose);
+    connect(camOpera, &CamraOperate::emitResultCam, this, &MainWindow::detectionDone);
     connect(camOpera, &CamraOperate::emitImagesignal, this, &MainWindow::showImageLabelChange);
     connect(calDialog,&CalibrateDialog::emitComSignal, this, &MainWindow::getRobotCom);
+    connect(this,&MainWindow::emitUIUpdata, this, &MainWindow::setReturnStrtoUI);
+    connect(this, &MainWindow::emitDetectionUIUpdata, this, &MainWindow::showDetectionRobotData);
+    connect(this,&MainWindow::emitHscLocData, this, &MainWindow::showHsrLocData);
 
-    connect(getLocTimer, &QTimer::timeout, this, &MainWindow::showHsrLocOnTime);
     connect(showgroupTimer, &QTimer::timeout, this, &MainWindow::setFrameInCenter);
-    connect(moveTimer, &QTimer::timeout, this, &MainWindow::startMove);
     //connect(getHscMsgTimer, &QTimer::timeout, this, &MainWindow::HscMsgStatusLET);
 
     connect(ui->actionCalibrate,&QAction::triggered,this,&MainWindow::showClibrateDialog);
@@ -171,10 +170,10 @@ void MainWindow::readRobotConfig()
                 ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(85, 255, 127)");
                 ui->lineEdit_rip->setReadOnly(true);
                 ui->lineEdit_rport->setReadOnly(true);
-                //getLocTimer->start(100);
-                //getHscMsgTimer->start(100);
                 sleep(1);
                 initRobot();
+                hscThredflat = true;
+                getHscLocDataStart();
                 setReturnStrtoUI("<font color = green> 连接机器人成功！！！</font>");
             }
             else
@@ -238,10 +237,11 @@ void MainWindow::connectHsRobotBnt()
             ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(85, 255, 127)");
             ui->lineEdit_rip->setReadOnly(true);
             ui->lineEdit_rport->setReadOnly(true);
-            getLocTimer->start(100);
             getHscMsgTimer->start(100);
             sleep(1);
             initRobot();
+            hscThredflat = true;
+            getHscLocDataStart();
             setReturnStrtoUI("<font color = green> 连接机器人成功！！！</font>");
          }
          else
@@ -259,8 +259,8 @@ void MainWindow::connectHsRobotBnt()
             ui->lineEdit_rport->setReadOnly(false);
             ui->pushButton_connectRobot->setText("连接");
             ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(２55, 255, 255)");
-            getLocTimer->stop();
             getHscMsgTimer->stop();
+            hscThredflat = false;
             setReturnStrtoUI("<font color = green> 断开连接机器人成功！！！</font>");
         }
         else
@@ -394,28 +394,45 @@ void MainWindow::setResultHsrLR()
     return;
 }
 
-void MainWindow::showHsrLocOnTime()
+void MainWindow::getHscLocDataStart()
 {
-    LocData locdata;
+    boost::function0<void > f = boost::bind(&MainWindow::getHscLocThrd, this);
+    HscLocThrd = new boost::thread(f);
+}
+
+void MainWindow::showHsrLocData(LocData data)
+{
     int bitNum = 2;
 
-    if(!hsc3->getHscLoc(locdata))
-    {
-        setReturnStrtoUI("<font color = red> 获取机器人笛卡尔坐标失败！！！ </font>");
-        return;
-    }
-    if(locdata.size() < 6)
+    if(data.size() < 6)
         return;
 
-    ui->label_X->setText(QString::number(locdata[0], 'f', bitNum));
-    ui->label_Y->setText(QString::number(locdata[1], 'f', bitNum));
-    ui->label_Z->setText(QString::number(locdata[2], 'f', bitNum));
-    ui->label_A->setText(QString::number(locdata[3], 'f', bitNum));
-    ui->label_B->setText(QString::number(locdata[4], 'f', bitNum));
-    ui->label_C->setText(QString::number(locdata[5], 'f', bitNum));
+    ui->label_X->setText(QString::number(data[0], 'f', bitNum));
+    ui->label_Y->setText(QString::number(data[1], 'f', bitNum));
+    ui->label_Z->setText(QString::number(data[2], 'f', bitNum));
+    ui->label_A->setText(QString::number(data[3], 'f', bitNum));
+    ui->label_B->setText(QString::number(data[4], 'f', bitNum));
+    ui->label_C->setText(QString::number(data[5], 'f', bitNum));
 
     return;
 
+}
+
+void MainWindow::getHscLocThrd()
+{
+    while(hscThredflat){
+        LocData locdata;
+
+        if(!hsc3->getHscLoc(locdata))
+        {
+            emitUIUpdata("<font color = red> 获取机器人笛卡尔坐标失败！！！ </font>");
+            return;
+        }
+
+        sendHscLocData(locdata);
+        sleep(1);
+    }
+    return;
 }
 
 void MainWindow::HscMsgStatusLET()
@@ -541,7 +558,15 @@ void MainWindow::camGetImageBnt()
 
 void MainWindow::detesionBnt()
 {
-    if(!camOpera->takePicture())
+    boost::function0<void > f = boost::bind(&MainWindow::detectionThread, this);
+    thrd = new boost::thread(f);
+}
+
+void MainWindow::detectionThread()
+{
+   int attemp = 0;
+   isdone = false;
+   if(!camOpera->takePicture())
         return;
 
     if(!camOpera->getImage())
@@ -550,62 +575,107 @@ void MainWindow::detesionBnt()
     if(!camOpera->detectionSrv())
         return;
 
-    sleep(3);
+    while(!isdone && attemp <= 10){
+        usleep(300000);
+        attemp++;
+    }
+    if(attemp >= 10){
+        emitUIUpdata("<font color = red> 识别等待超时!!! </font>");
+        return;
+    }
+
+    isdone = false;
+
+    getCamPose(objType);
 
     if(!isDetesion){
         std::cout<< "识别失败："<<isDetesion<<std::endl;
-        setReturnStrtoUI("<font color = red> 识别娃娃失败!!! </font>");
+        emitUIUpdata("<font color = red> 识别娃娃失败!!! </font>");
         return;
     }
 
     if(!camOpera->getDetesionResult(camX,camY,detesionRPose))
         return;
 
-    ui->lineEdit_result_X->setText(QString::number(detesionRPose[0],'f',4));
-    ui->lineEdit_result_Y->setText(QString::number(detesionRPose[1],'f',4));
-    ui->lineEdit_result_Z->setText(QString::number(detesionRPose[2],'f',4));
-    ui->lineEdit_result_A->setText(QString::number(detesionRPose[3],'f',4));
-    ui->lineEdit_result_B->setText(QString::number(detesionRPose[4],'f',4));
-    ui->lineEdit_result_C->setText(QString::number(detesionRPose[5],'f',4));
-
-    LocData locData;
-    locData = detesionRPose;
-    if(!hsc3->setHscLR(100, locData))
-    {
-        setReturnStrtoUI("<font color = red> 识别娃娃失败,LR!!! </font>");
-        return;
-    }
+    emitDetectionUIUpdata(detesionRPose[0],detesionRPose[1]);
 
     return;
 }
 
-void MainWindow::getCamPose(geometry_msgs::PoseStamped pose)
+void MainWindow::getCamPose(ObjType type)
 {
+    vector<geometry_msgs::Pose>::iterator k;
+    geometry_msgs::Pose pose;
+
+    if(type == BEAR){
+        if(camOpera->vecBear.size() <= 0){
+            emitUIUpdata("<font color = red> 没有小熊了!!! </font>");
+            return;
+        }
+        k = camOpera->vecBear.begin();
+        pose = camOpera->vecBear[0];
+        camOpera->vecBear.erase(k);
+    }
+    else if(type == RABBIT){
+        if(camOpera->vecRabbit.size() <= 0){
+            emitUIUpdata("<font color = red> 没有小兔子了!!! </font>");
+            return;
+        }
+        k = camOpera->vecRabbit.begin();
+        pose = camOpera->vecRabbit[0];
+        camOpera->vecRabbit.erase(k);
+    }
+    else if(type == GIRAFFE){
+        if(camOpera->vecGiraffe.size() <= 0){
+            emitUIUpdata("<font color = red> 没有长颈鹿了!!! </font>");
+            return;
+        }
+        k = camOpera->vecGiraffe.begin();
+        pose = camOpera->vecGiraffe[0];
+        camOpera->vecGiraffe.erase(k);
+    }
+    else {
+        return;
+    }
+
+    //画框尺寸
+    squareAX = static_cast<int>(pose.orientation.w);
+    squareAY = static_cast<int>(pose.orientation.x);
+    squareBX = static_cast<int>(pose.orientation.y);
+    squareBY = static_cast<int>(pose.orientation.z);
+
+    squareWidth = squareBX - squareAX;
+    squareHeigth = squareBY - squareAY;
+
+    comX = squareWidth / 2;
+    comY = squareWidth / 2;
+
     //１，识别成功　０，识别失败
-    isDetesion = static_cast<bool>(pose.pose.position.x);
+    isDetesion = static_cast<bool>(pose.position.x);
 
 
     //识别的相机坐标
-    //camX = static_cast<int>(pose.pose.orientation.x);
-    //camY = static_cast<int>(pose.pose.orientation.y);
+    camX = static_cast<int>(pose.position.y);
+    camY = static_cast<int>(pose.position.z);
 
-    //画框尺寸
-    squareX = static_cast<int>(pose.pose.orientation.w);
-    squareY = static_cast<int>(pose.pose.orientation.x);
-    squareWidth = static_cast<int>(pose.pose.orientation.y);
-    squareHeigth = static_cast<int>(pose.pose.orientation.z);
-
-    if(isDetesion)
-        if(!camOpera->opencvDrawing(squareX,squareY,squareWidth,squareHeigth)){
+    if(isDetesion){
+        if(!camOpera->opencvDrawing(squareAX,squareAY,squareWidth,squareHeigth)){
             cv::Mat darw = cv::imread(camImageFileName.toStdString());
             showImageLabelChange(darw);
             return;
         }
-
+    }
+    isdone = true;
     return;
 }
 
 void MainWindow::startMove()
+{
+    boost::function0<void > f = boost::bind(&MainWindow::startMoveThrd, this);
+    moveThrd = new boost::thread(f);
+}
+
+void MainWindow::startMoveThrd()
 {
     double value = 0;
     int attemp = 0;
@@ -620,33 +690,30 @@ void MainWindow::startMove()
 
     if(attemp >= 3)
     {
-        setReturnStrtoUI("<font color = green> 机器人到位失败!!! </font>");
-        moveTimer->stop();
+        emitUIUpdata("<font color = green> 机器人到位失败!!! </font>");
         return;
     }
 
-    setReturnStrtoUI("<font color = green> 机器人已到位!!! </font>");
+    emitUIUpdata("<font color = green> 机器人已到位!!! </font>");
 
     //识别
-    detesionBnt();
+    detectionThread();
 
-    setReturnStrtoUI("<font color = green> 识别成功，正在抓取!!! </font>");
+    emitUIUpdata("<font color = green> 识别成功，正在抓取!!! </font>");
 
     if(!hsc3->setHscR(12,1))
     {
-        setReturnStrtoUI("<font color = red> 抓取成功!!! </font>");
-        moveTimer->stop();
+        emitUIUpdata("<font color = red> 抓取成功!!! </font>");
         return;
     }
 
-    setReturnStrtoUI("<font color = green> 抓取成功!!! </font>");
-    moveTimer->stop();
+    emitUIUpdata("<font color = green> 抓取成功!!! </font>");
     return;
 }
 
 void MainWindow::startMaulModeBnt()
 {
-    moveTimer->start(100);
+    startMove();
     return;
 }
 
@@ -654,16 +721,16 @@ void MainWindow::selectObjCombobox(int index)
 {
     switch (index) {
     case 0:
-        objType = DOG;
-        setReturnStrtoUI("<font color = green > 选择小狗狗 </font>");
+        objType = BEAR;
+        setReturnStrtoUI("<font color = green > 选择小熊 </font>");
         break;
     case 1:
         objType = RABBIT;
-        setReturnStrtoUI("<font color = green > 选择小兔兔 </font>");
+        setReturnStrtoUI("<font color = green > 选择小兔子 </font>");
         break;
     case 2:
-        objType = MONKEY;
-        setReturnStrtoUI("<font color = green > 选择小猴子 </font>");
+        objType = GIRAFFE;
+        setReturnStrtoUI("<font color = green > 选择长颈鹿 </font>");
         break;
     default:
         objType = NONE;
@@ -738,5 +805,52 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //        calDialog->close();
 //        event->accept(); // 接受退出信号，程序退出
 //    }
+    return;
+}
+
+void MainWindow::showDetectionRobotData(double rx, double ry)
+{
+    LocData locdata;
+    int Lrindex = 13;
+    if(!hsc3->getHscLR(Lrindex,locdata))
+    {
+        emitUIUpdata("<font color = red> 获取机器人坐标失败!!! </font>");
+        return;
+    }
+
+    ui->lineEdit_result_X->setText(QString::number(rx,'f',4));
+    ui->lineEdit_result_Y->setText(QString::number(ry,'f',4));
+    ui->lineEdit_result_Z->setText(QString::number(locdata[2],'f',4));
+    ui->lineEdit_result_A->setText(QString::number(locdata[3],'f',4));
+    ui->lineEdit_result_B->setText(QString::number(locdata[4],'f',4));
+    ui->lineEdit_result_C->setText(QString::number(locdata[5],'f',4));
+
+    locdata[0] = rx;
+    locdata[1] = ry;
+
+    if(!hsc3->setHscLR(Lrindex, locdata))
+    {
+        emitUIUpdata("<font color = red> 识别娃娃失败,LR!!! </font>");
+        return;
+    }
+}
+
+void MainWindow::detectionDone(bool have, int numB, int numR, int numG)
+{
+    if(!have){
+        isdone = false;
+        emitUIUpdata("<font color = red> 无识别物体!!! </font>");
+        return;
+    }
+    QString strB = QString::number(numB);
+    QString strR = QString::number(numR);
+    QString strG = QString::number(numG);
+
+    emitUIUpdata("<font color = red> 识别完成!!! </font>");
+    emitUIUpdata("<font color = red> 小熊：　"+strB+"!!! </font>");
+    emitUIUpdata("<font color = red> 小兔子："+strR+"!!! </font>");
+    emitUIUpdata("<font color = red> 长颈鹿："+strG+"!!! </font>");
+
+    isdone = true;
     return;
 }

@@ -10,9 +10,9 @@
 #include <boost/thread.hpp>
 
 enum ObjType{
-    DOG = 0,
+    BEAR = 0,
     RABBIT = 1,
-    MONKEY = 2,
+    GIRAFFE = 2,
     NONE,
 };
 

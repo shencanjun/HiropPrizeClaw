@@ -593,17 +593,17 @@ QWidget:focus{outline: none;}</string>
                 </property>
                 <item>
                  <property name="text">
-                  <string>小狗狗</string>
+                  <string>小熊</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>小兔兔</string>
+                  <string>小兔子</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>小猴子</string>
+                  <string>长颈鹿</string>
                  </property>
                 </item>
                </widget>

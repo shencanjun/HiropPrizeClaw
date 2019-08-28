@@ -60,8 +60,8 @@ private:
     void getObjectArray_callback(const vision_bridge::ObjectArray::ConstPtr &msg);
 
 public:
-    void send(geometry_msgs::PoseStamped pose) const{
-        emit emitResultCam(pose);
+    void send(bool have,int numBear, int numRabbit, int numGiraffe) const{
+        emit emitResultCam(have, numBear, numRabbit, numGiraffe);
     }
 
     void sendImage(cv::Mat mat) const{
@@ -69,7 +69,7 @@ public:
     }
 
 signals:
-    void emitResultCam(geometry_msgs::PoseStamped) const;
+    void emitResultCam(bool, int , int , int) const;
     void emitImagesignal(cv::Mat) const;
 
 public:
@@ -77,6 +77,10 @@ public:
     std::string camCalibXmlFileName;
     cv::Mat colorImg;
     cv::Mat calibrateImage;
+
+    std::vector< geometry_msgs::Pose > vecBear;
+    std::vector< geometry_msgs::Pose > vecRabbit;
+    std::vector< geometry_msgs::Pose > vecGiraffe;
 
 private:
     ros::NodeHandle n_camra;
@@ -92,8 +96,6 @@ private:
     std::vector<geometry_msgs::PoseStamped> resultPoses;
 
     EyeCalib2D *Calib2D;
-
-
 };
 
 #endif // CAMRAOPERATE_H
