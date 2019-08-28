@@ -9,8 +9,8 @@ CalibrateDialog::CalibrateDialog(QWidget *parent) :
     raw = 0;
     ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     tableMenu = new QMenu(ui->tableWidget);
-    tableMenu->setStyleSheet("background-color: rgb(255, 255, 255)");
-    action = new QAction("删除", this);
+    tableMenu->setStyleSheet("background-color: rgb(238, 238, 236);color: rgb(46, 52, 54);");
+    action = new QAction("撤回", this);
     parse = new ParseConfig();
     connect(action, &QAction::triggered, this, &CalibrateDialog::slotActionDelete);
     connect(ui->pushButton_startCalib, &QPushButton::clicked, this, &CalibrateDialog::startCalibration);
@@ -66,6 +66,7 @@ void CalibrateDialog::startCalibration()
 void CalibrateDialog::recordCalibrateData()
 {
     LocData data;
+    std::vector<double> calData;
     if(!Chsc3->getHscLoc(data)){
         std::cout<<"获取机器人笛卡尔坐标失败！！！"<<std::endl;
         QMessageBox::warning(NULL, "提示", "<font color = red >获取机器人笛卡尔坐标失败！！！</font>", QMessageBox::Yes);
@@ -76,20 +77,20 @@ void CalibrateDialog::recordCalibrateData()
         QMessageBox::warning(NULL, "提示", "<font color = red >机器人笛卡尔坐标错误！！！</font>", QMessageBox::Yes);
         return;
     }
-
-    hscLocData = data;
-    if(!camCalib->writeCalibrateData(data[0],data[1],raw))
-    {
+    if(data.size() <= 2)
         return;
-    }
-    //std::cout<<"raw:" <<raw<<std::endl;
 
     ui->tableWidget->setItem(raw, rColumnX, new QTableWidgetItem(QString::number(data[0], 'f', 4)));
     ui->tableWidget->setItem(raw, rColumnY, new QTableWidgetItem(QString::number(data[1], 'f', 4)));
 
+    calData.push_back(data[0]);
+    calData.push_back(data[1]);
+
+    calibraData.push_back(calData);
+    std::cout<<"raw:"<<raw<<std::endl;
     raw++;
     if(raw >= 9)
-        raw = 0;
+        raw = 9;
 
     return;
 }
@@ -97,6 +98,16 @@ void CalibrateDialog::recordCalibrateData()
 void CalibrateDialog::getCalibrationResult()
 {
     double accu;
+    if(calibraData.size()<9){
+        QMessageBox::warning(NULL, "提示", "<font color = red >数据不完整,\n请记录完整后再进行标定</font>", QMessageBox::Ok);
+        return;
+    }
+
+    for(int i = 0; i < calibraData.size(); i++){
+        if(!camCalib->writeCalibrateData(calibraData[i][0],calibraData[i][1],i)){
+            return;
+        }
+    }
     if(!camCalib->getCalibrateResult(accu))
     {
         QMessageBox::warning(NULL, "提示", "<font color = red >标定失败!!!</font>", QMessageBox::Yes);
@@ -116,7 +127,17 @@ void CalibrateDialog::on_tableWidget_customContextMenuRequested(const QPoint &po
 
 void CalibrateDialog::slotActionDelete()
 {
-    QMessageBox::warning(NULL, "提示", "<font color = red >是否确认删除本列数据？</font>", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    std::cout<<"delete"<<std::endl;
+    if(calibraData.size() <= 0)
+        return;
+    calibraData.pop_back();
+    raw--;
+    ui->tableWidget->setItem(raw, rColumnX, new QTableWidgetItem(""));
+    ui->tableWidget->setItem(raw, rColumnY, new QTableWidgetItem(""));
+    //QMessageBox::warning(NULL, "提示", "<font color = red >是否确认撤回数据？</font>", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    std::cout<<"raw:"<<raw<<std::endl;
+    if(raw <= 0)
+        raw = 0;
     return;
 }
 
@@ -126,7 +147,7 @@ void CalibrateDialog::SaveCalibration()
                         ui->label_accuary->text().toDouble(),
                         ui->lineEdit_compensateX->text().toDouble(),
                         ui->lineEdit_compensateY->text().toDouble());
-
+    sendCom();
     return;
 }
 

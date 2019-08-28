@@ -59,11 +59,15 @@ private:
     std::vector<double> detesionRPose;
     ObjType objType;
 
+    double comX;
+    double comY;
+
 public:
     HSC3ROBOT *hsc3;
     CamraOperate *camOpera;
 
 public:
+
     void readMainXml();
 
     void setReturnStrtoUI(QString str);
@@ -73,6 +77,8 @@ public:
     void readRobotConfig();
 
     void initRobot();
+
+    void getRobotCom();
 
     void showClibrateDialog();
 

@@ -31,6 +31,7 @@ private:
     CamraOperate *camCalib;
     LocData hscLocData;
     ParseConfig *parse;
+    std::vector< std::vector<double> > calibraData;
 
     int raw;
     int column;
@@ -57,8 +58,16 @@ private:
 public:
     void setOpeaObject(HSC3ROBOT *MWhsc3, CamraOperate *cam);
     void readCalibrateData();
-
     QString calibDataFileName;
+
+
+public:
+    void sendCom() const{
+        emit emitComSignal();
+    }
+
+signals:
+    void emitComSignal() const;
 
 };
 

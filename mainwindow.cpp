@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(voice,&VoiceRecognite::emitResultStr,this,&MainWindow::showVoiceRecognitionResult);
     connect(camOpera, &CamraOperate::emitResultCam, this, &MainWindow::getCamPose);
     connect(camOpera, &CamraOperate::emitImagesignal, this, &MainWindow::showImageLabelChange);
+    connect(calDialog,&CalibrateDialog::emitComSignal, this, &MainWindow::getRobotCom);
 
     connect(getLocTimer, &QTimer::timeout, this, &MainWindow::showHsrLocOnTime);
     connect(showgroupTimer, &QTimer::timeout, this, &MainWindow::setFrameInCenter);
@@ -66,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     showgroupTimer->start(300);
     camOpera->startCamraService();
+    getRobotCom();
     //readRobotConfig();
 }
 
@@ -80,6 +82,17 @@ MainWindow::~MainWindow()
 void MainWindow::sendNodeHanle(ros::NodeHandle n)
 {
     n_MW = n;
+    return;
+}
+
+void MainWindow::getRobotCom()
+{
+    double acc;
+    if(parse->readCalibXML(calibXmlName,acc,comX,comY)){
+        setReturnStrtoUI("<font color = green> 获取补偿值成功 </font>");
+        return;
+    }
+    setReturnStrtoUI("<font color = red> 获取补偿值失败 </font>");
     return;
 }
 
@@ -713,16 +726,17 @@ void MainWindow::setFrameInCenter()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    QMessageBox::StandardButton button;
-    button=QMessageBox::question(this,tr("退出程序"),QString(tr("确认退出程序")),QMessageBox::Yes|QMessageBox::No);
-    if(button==QMessageBox::No)
-    {
-        event->ignore(); // 忽略退出信号，程序继续进行
-    }
-    else if(button==QMessageBox::Yes)
-    {
-        calDialog->close();
-        event->accept(); // 接受退出信号，程序退出
-    }
-    //return;
+    calDialog->close();
+//    QMessageBox::StandardButton button;
+//    button=QMessageBox::question(this,tr("退出程序"),QString(tr("确认退出程序")),QMessageBox::Yes|QMessageBox::No);
+//    if(button==QMessageBox::No)
+//    {
+//        event->ignore(); // 忽略退出信号，程序继续进行
+//    }
+//    else if(button==QMessageBox::Yes)
+//    {
+//        calDialog->close();
+//        event->accept(); // 接受退出信号，程序退出
+//    }
+    return;
 }
