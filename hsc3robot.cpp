@@ -10,10 +10,12 @@ HSC3ROBOT::HSC3ROBOT()
     proSys = new ProxySys(comapi);
     proVar = new ProxyVar(comapi);
     proVm = new ProxyVm(comapi);
+    proIo = new ProxyIO(comapi);
 }
 
 HSC3ROBOT::~HSC3ROBOT()
 {
+    delete proIo;
     delete proVm;
     delete proVar;
     delete proSys;
@@ -134,6 +136,18 @@ bool HSC3ROBOT::setHscVord(int vord)
 {
     //ret = proMotion->setJogVord();
     ret = proMotion->setVord(vord);
+    return ret == 0 ? true : false;
+}
+
+bool HSC3ROBOT::getHscIoValue(int index, bool &value)
+{
+    ret = proIo->getDout(index,value);
+    return ret == 0 ? true : false;
+}
+
+bool HSC3ROBOT::setHscIoValue(int index, bool value)
+{
+    ret = proIo->setDout(index, value);
     return ret == 0 ? true : false;
 }
 

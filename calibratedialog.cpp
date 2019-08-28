@@ -12,6 +12,7 @@ CalibrateDialog::CalibrateDialog(QWidget *parent) :
     tableMenu->setStyleSheet("background-color: rgb(238, 238, 236);color: rgb(46, 52, 54);");
     action = new QAction("撤回", this);
     parse = new ParseConfig();
+    recordTimer = new QTimer();
     connect(action, &QAction::triggered, this, &CalibrateDialog::slotActionDelete);
     connect(ui->pushButton_startCalib, &QPushButton::clicked, this, &CalibrateDialog::startCalibration);
     connect(ui->pushButton_record,&QPushButton::clicked,this,&CalibrateDialog::recordCalibrateData);
@@ -19,6 +20,7 @@ CalibrateDialog::CalibrateDialog(QWidget *parent) :
     connect(ui->tableWidget, &QTableWidget::customContextMenuRequested,
             this, &CalibrateDialog::on_tableWidget_customContextMenuRequested);
     connect(ui->pushButton_save, &QPushButton::clicked, this, &CalibrateDialog::SaveCalibration);
+    connect(recordTimer, &QTimer::timeout, this, &CalibrateDialog::startHscCalibrate);
 }
 
 CalibrateDialog::~CalibrateDialog()
@@ -60,6 +62,7 @@ void CalibrateDialog::startCalibration()
         ui->tableWidget->setItem(i, cColumnX, new QTableWidgetItem(QString::number(cx, 'f', 4)));
         ui->tableWidget->setItem(i, cColumnY, new QTableWidgetItem(QString::number(cy, 'f', 4)));
     }
+    recordTimer->start(500);
     return;
 }
 
@@ -102,7 +105,7 @@ void CalibrateDialog::getCalibrationResult()
         QMessageBox::warning(NULL, "提示", "<font color = red >数据不完整,\n请记录完整后再进行标定</font>", QMessageBox::Ok);
         return;
     }
-
+    recordTimer->stop();
     for(int i = 0; i < calibraData.size(); i++){
         if(!camCalib->writeCalibrateData(calibraData[i][0],calibraData[i][1],i)){
             return;
@@ -148,6 +151,24 @@ void CalibrateDialog::SaveCalibration()
                         ui->lineEdit_compensateX->text().toDouble(),
                         ui->lineEdit_compensateY->text().toDouble());
     sendCom();
+    return;
+}
+
+void CalibrateDialog::startHscCalibrate()
+{
+    bool io;
+    if(Chsc3->getHscIoValue(28,io)){
+        if(io){
+            recordCalibrateData();
+            Chsc3->setHscIoValue(28,false);
+        }
+        else{
+            ;
+        }
+    }
+    else {
+        std::cout<<"获取机器人ＩＯ值失败"<<std::endl;
+    }
     return;
 }
 

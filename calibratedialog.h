@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QMenu>
 #include <QAction>
+#include <QTimer>
 #include <iostream>
 #include <vector>
 #include "hsc3robot.h"
@@ -31,6 +32,7 @@ private:
     CamraOperate *camCalib;
     LocData hscLocData;
     ParseConfig *parse;
+    QTimer *recordTimer;
     std::vector< std::vector<double> > calibraData;
 
     int raw;
@@ -54,6 +56,8 @@ private:
     void slotActionDelete();
 
     void on_tableWidget_customContextMenuRequested(const QPoint &pos);
+
+    void startHscCalibrate();
 
 public:
     void setOpeaObject(HSC3ROBOT *MWhsc3, CamraOperate *cam);

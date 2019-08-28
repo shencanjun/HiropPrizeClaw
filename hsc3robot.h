@@ -12,6 +12,7 @@
 #include "3rdparty/include/proxy/ProxyVar.h"
 #include "3rdparty/include/proxy/ProxySys.h"
 #include "3rdparty/include/proxy/ProxyVm.h"
+#include "3rdparty/include/proxy/ProxyIO.h"
 
 
 using namespace Hsc3::Comm;
@@ -58,6 +59,10 @@ public:
 
     bool setHscVord(int vord);
 
+    bool setHscIoValue(int index, bool value);
+
+    bool getHscIoValue(int index, bool &value);
+
 protected:
 
     CommApi *comapi;
@@ -65,6 +70,7 @@ protected:
     ProxySys *proSys;
     ProxyVar *proVar;
     ProxyVm *proVm;
+    ProxyIO *proIo;
     HMCErrCode ret;
 
     LocPos getLRData;
