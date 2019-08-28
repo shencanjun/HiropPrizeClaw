@@ -34,7 +34,7 @@ FORMS    += mainwindow.ui \
     calibratedialog.ui
 
 INCLUDEPATH += ./ \
-               /home/ros/catkin_ws/devel/include \
+               /home/fshs/catkin_ws/devel/include \
                /opt/ros/kinetic/include \
                3rdparty/include \
                /usr/local/include/eigen3 \
@@ -45,5 +45,5 @@ LIBS+= -L/opt/ros/kinetic/lib -lroscpp -lroscpp_serialization -lroslib -lroscons
 LIBS+= -L/usr/local/lib -ljsoncpp -lboost_system -lHandEye
 LIBS+= -L/opt/ros/kinetic/lib/x86_64-linux-gnu -lopencv_core3 -lopencv_imgcodecs3 -lopencv_imgproc3
 
-#LIBS+= -L/home/fshs/work/HiropPrizeClaw/3rdparty/lib/HsApi -lCommApi -lHsc3Api -lLogApi
-LIBS+= -L/home/ros/HiropPrizeClaw/HiropPrizeClaw/3rdparty/lib/HsApi -lCommApi -lHsc3Api -lLogApi
+LIBS+= -L/home/fshs/work/HiropPrizeClaw/3rdparty/lib/HsApi -lCommApi -lHsc3Api -lLogApi
+#LIBS+= -L/home/ros/HiropPrizeClaw/HiropPrizeClaw/3rdparty/lib/HsApi -lCommApi -lHsc3Api -lLogApi

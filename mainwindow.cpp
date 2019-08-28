@@ -7,15 +7,15 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    qRegisterMetaType<geometry_msgs::Pose>("geometry_msgs::Pose");
+    qRegisterMetaType<geometry_msgs::PoseStamped>("geometry_msgs::PoseStamped");
     qRegisterMetaType<cv::Mat>("cv::Mat");
 
-    MainXmlFile = "/home/ros/HiropPrizeClaw/build-HiropPrizeClaw-unknown-Debug/MainConfig.xml";
+    MainXmlFile = "/home/fshs/HiropPrizeClaw/build-HiropPrizeClaw-unknown-Debug/MainConfig.xml";
 
     progName = "HIROP.PRG";
-    camImageFileName ="/home/ros/show.jpg";
+    camImageFileName ="/home/fshs/show.jpg";
     camXmlFileName = "calibrate";
-    calibXmlName = "/home/ros/calibrateData.xml";
+    calibXmlName = "/home/fshs/calibrateData.xml";
     objType = DOG;
     isDetesion = false;
     HscStatus = true;
@@ -171,8 +171,8 @@ void MainWindow::readRobotConfig()
                 ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(85, 255, 127)");
                 ui->lineEdit_rip->setReadOnly(true);
                 ui->lineEdit_rport->setReadOnly(true);
-                getLocTimer->start(100);
-                getHscMsgTimer->start(100);
+                //getLocTimer->start(100);
+                //getHscMsgTimer->start(100);
                 sleep(1);
                 initRobot();
                 setReturnStrtoUI("<font color = green> 连接机器人成功！！！</font>");
@@ -226,8 +226,6 @@ void MainWindow::initRobot()
 
 void MainWindow::connectHsRobotBnt()
 {
-    calDialog->close();
-    return;
     std::string ipstr = ui->lineEdit_rip->text().toStdString();
     uint16_t port = ui->lineEdit_rport->text().toUShort();
 
@@ -235,6 +233,7 @@ void MainWindow::connectHsRobotBnt()
     {
         if(hsc3->connectIPC(ipstr,port))
          {
+            std::cout<<"sadsder"<<std::endl;
             ui->pushButton_connectRobot->setText("断开");
             ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(85, 255, 127)");
             ui->lineEdit_rip->setReadOnly(true);
@@ -551,7 +550,7 @@ void MainWindow::detesionBnt()
     if(!camOpera->detectionSrv())
         return;
 
-    sleep(1.0);
+    sleep(3);
 
     if(!isDetesion){
         std::cout<< "识别失败："<<isDetesion<<std::endl;
@@ -583,11 +582,12 @@ void MainWindow::detesionBnt()
 void MainWindow::getCamPose(geometry_msgs::PoseStamped pose)
 {
     //１，识别成功　０，识别失败
-    isDetesion = static_cast<bool>(pose.pose.position.z);
+    isDetesion = static_cast<bool>(pose.pose.position.x);
+
 
     //识别的相机坐标
-    camX = static_cast<int>(pose.pose.position.x);
-    camY = static_cast<int>(pose.pose.position.y);
+    //camX = static_cast<int>(pose.pose.orientation.x);
+    //camY = static_cast<int>(pose.pose.orientation.y);
 
     //画框尺寸
     squareX = static_cast<int>(pose.pose.orientation.w);

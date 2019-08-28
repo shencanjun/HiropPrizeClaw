@@ -121,6 +121,13 @@ void CamraOperate::getObjectArray_callback(const vision_bridge::ObjectArray::Con
     for(int i=0;i<msg->objects.size();i++){
         resultPose.header.frame_id = msg->objects[i].name;
         resultPose.pose = msg->objects[i].pose.pose;
+        std::cout<<"resultPose.pose.x:"<<resultPose.pose.position.x<<std::endl;
+        std::cout<<"resultPose.pose.y:"<<resultPose.pose.position.y<<std::endl;
+        std::cout<<"resultPose.pose.z:"<<resultPose.pose.position.z<<std::endl;
+        std::cout<<"resultPose.orientation.x:"<<resultPose.pose.orientation.x<<std::endl;
+        std::cout<<"resultPose.orientation.y:"<<resultPose.pose.orientation.y<<std::endl;
+        std::cout<<"resultPose.orientation.z:"<<resultPose.pose.orientation.z<<std::endl;
+        std::cout<<"resultPose.orientation.w:"<<resultPose.pose.orientation.w<<std::endl;
     }
     send(resultPose);
     return;
