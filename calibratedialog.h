@@ -33,6 +33,7 @@ private:
     LocData hscLocData;
     ParseConfig *parse;
     QTimer *recordTimer;
+    QTimer *deleteTimer;
     std::vector< std::vector<double> > calibraData;
 
     int raw;
@@ -58,6 +59,8 @@ private:
     void on_tableWidget_customContextMenuRequested(const QPoint &pos);
 
     void startHscCalibrate();
+
+    void HscCalibrateDelete();
 
 public:
     void setOpeaObject(HSC3ROBOT *MWhsc3, CamraOperate *cam);

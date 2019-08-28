@@ -10,9 +10,12 @@ CalibrateDialog::CalibrateDialog(QWidget *parent) :
     ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     tableMenu = new QMenu(ui->tableWidget);
     tableMenu->setStyleSheet("background-color: rgb(238, 238, 236);color: rgb(46, 52, 54);");
+
     action = new QAction("撤回", this);
     parse = new ParseConfig();
     recordTimer = new QTimer();
+    deleteTimer = new QTimer();
+
     connect(action, &QAction::triggered, this, &CalibrateDialog::slotActionDelete);
     connect(ui->pushButton_startCalib, &QPushButton::clicked, this, &CalibrateDialog::startCalibration);
     connect(ui->pushButton_record,&QPushButton::clicked,this,&CalibrateDialog::recordCalibrateData);
@@ -21,6 +24,7 @@ CalibrateDialog::CalibrateDialog(QWidget *parent) :
             this, &CalibrateDialog::on_tableWidget_customContextMenuRequested);
     connect(ui->pushButton_save, &QPushButton::clicked, this, &CalibrateDialog::SaveCalibration);
     connect(recordTimer, &QTimer::timeout, this, &CalibrateDialog::startHscCalibrate);
+    connect(deleteTimer, &QTimer::timeout, this, &CalibrateDialog::HscCalibrateDelete);
 }
 
 CalibrateDialog::~CalibrateDialog()
@@ -63,6 +67,7 @@ void CalibrateDialog::startCalibration()
         ui->tableWidget->setItem(i, cColumnY, new QTableWidgetItem(QString::number(cy, 'f', 4)));
     }
     recordTimer->start(500);
+    deleteTimer->start(500);
     return;
 }
 
@@ -106,6 +111,7 @@ void CalibrateDialog::getCalibrationResult()
         return;
     }
     recordTimer->stop();
+    deleteTimer->stop();
     for(int i = 0; i < calibraData.size(); i++){
         if(!camCalib->writeCalibrateData(calibraData[i][0],calibraData[i][1],i)){
             return;
@@ -161,6 +167,24 @@ void CalibrateDialog::startHscCalibrate()
         if(io){
             recordCalibrateData();
             Chsc3->setHscIoValue(28,false);
+        }
+        else{
+            ;
+        }
+    }
+    else {
+        std::cout<<"获取机器人ＩＯ值失败"<<std::endl;
+    }
+    return;
+}
+
+void CalibrateDialog::HscCalibrateDelete()
+{
+    bool io;
+    if(Chsc3->getHscIoValue(29,io)){
+        if(io){
+            slotActionDelete();
+            Chsc3->setHscIoValue(29,false);
         }
         else{
             ;
