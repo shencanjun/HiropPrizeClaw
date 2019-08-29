@@ -32,6 +32,7 @@ void VoiceRecognite::parseIntent(std::string &data)
 {
     Json::Reader reader;
     Json::Value intentRoot;
+    std::cout<<"parse"<<std::endl;
 
     if(!reader.parse(data,intentRoot,false)){
          std::cout<<"Intent Rooot parse error!!!"<<std::endl;

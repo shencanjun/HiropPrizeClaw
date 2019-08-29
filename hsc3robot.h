@@ -63,6 +63,8 @@ public:
 
     bool getHscIoValue(int index, bool &value);
 
+    bool setHscMode(OpMode mode);
+
 protected:
 
     CommApi *comapi;

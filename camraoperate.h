@@ -48,11 +48,13 @@ public:
 
     bool getDetesionResult(int x, int y, std::vector<double> &pose);
 
-    bool opencvDrawing(int x, int y, int wide, int high);
+    bool opencvDrawing(int, int, int, int, cv::Mat&, QString, cv::String,cv::Scalar);
 
     bool detectionSrv();
 
     bool getCalibrateImage();
+
+    bool getCalibraHomeData();
 
 private:
     void getImage_callback(const sensor_msgs::ImageConstPtr &msg);
@@ -75,6 +77,7 @@ signals:
 public:
     std::string imgFileName;
     std::string camCalibXmlFileName;
+    QString AdetecImgFIle;
     cv::Mat colorImg;
     cv::Mat calibrateImage;
 

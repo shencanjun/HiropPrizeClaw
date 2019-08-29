@@ -151,5 +151,9 @@ bool HSC3ROBOT::setHscIoValue(int index, bool value)
     return ret == 0 ? true : false;
 }
 
-
+bool HSC3ROBOT::setHscMode(OpMode mode)
+{
+    ret = proMotion->setOpMode(mode);
+    return ret == 0 ? true : false;
+}
 

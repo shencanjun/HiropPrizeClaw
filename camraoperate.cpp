@@ -99,6 +99,7 @@ bool CamraOperate::sendtImage()
 void CamraOperate::getImage_callback(const sensor_msgs::ImageConstPtr &msg)
 {
     ROS_INFO("GET IMAGE");
+    colorImg.release();
     try
     {
         color_ptr = cv_bridge::toCvCopy(msg, "bgr8");
@@ -116,42 +117,65 @@ void CamraOperate::getImage_callback(const sensor_msgs::ImageConstPtr &msg)
 void CamraOperate::getObjectArray_callback(const vision_bridge::ObjectArray::ConstPtr &msg)
 {
     std::cout<<"getObjectArray"<<std::endl;
+    cv::Mat ImgMat;
     geometry_msgs::Pose msgPose;
     bool have;
     double rcoRate = 0;
-    if(msg->objects.size() <= 0)
+    vecBear.clear();
+    vecRabbit.clear();
+    vecGiraffe.clear();
+    ImgMat = colorImg;
+    if(msg->objects.size() <= 0){
         return;
+    }
+    std::cout<<"msg->objects.size():"<<msg->objects.size()<<std::endl;
     for(int i=0;i<msg->objects.size();i++){
         msgPose = msg->objects[i].pose.pose;
 
-        if(!static_cast<bool >(msgPose.position.x)){
+        if(!static_cast<bool >(msgPose.position.x)){    
             have = false;
             break;
         }
 
         if((static_cast<int >(msgPose.position.z)) == 1){
             vecBear.push_back(msgPose);
+            opencvDrawing(msgPose.orientation.x,msgPose.orientation.y,
+                          msgPose.orientation.z,msgPose.orientation.w,
+                          ImgMat,AdetecImgFIle,cv::String("Bear"),
+                          cv::Scalar(255,0,0));
         }
         else if((static_cast<int >(msgPose.position.z)) == 2){
             vecRabbit.push_back(msgPose);
+            opencvDrawing(msgPose.orientation.x,msgPose.orientation.y,
+                          msgPose.orientation.z,msgPose.orientation.w,
+                          ImgMat,AdetecImgFIle,cv::String("Rabbit"),
+                          cv::Scalar(0,255,0));
         }
         else if((static_cast<int >(msgPose.position.z)) == 3){
             vecGiraffe.push_back(msgPose);
+            opencvDrawing(msgPose.orientation.x,msgPose.orientation.y,
+                          msgPose.orientation.z,msgPose.orientation.w,
+                          ImgMat,AdetecImgFIle,cv::String("Giraffe"),
+                          cv::Scalar(0,0,255));
         }
         else{
             ;
         }
         have = true;
         rcoRate = msgPose.position.y;
-        std::cout<<"resultPose.pose.x:"<<resultPose.pose.position.x<<std::endl;
-        std::cout<<"resultPose.pose.y:"<<resultPose.pose.position.y<<std::endl;
-        std::cout<<"resultPose.pose.z:"<<resultPose.pose.position.z<<std::endl;
-        std::cout<<"resultPose.orientation.x:"<<resultPose.pose.orientation.x<<std::endl;
-        std::cout<<"resultPose.orientation.y:"<<resultPose.pose.orientation.y<<std::endl;
-        std::cout<<"resultPose.orientation.z:"<<resultPose.pose.orientation.z<<std::endl;
-        std::cout<<"resultPose.orientation.w:"<<resultPose.pose.orientation.w<<std::endl;
+
+
+
+        std::cout<<"msgPose.pose.x:"<<msgPose.position.x<<std::endl;
+        std::cout<<"msgPose.pose.y:"<<msgPose.position.y<<std::endl;
+        std::cout<<"msgPose.pose.z:"<<msgPose.position.z<<std::endl;
+        std::cout<<"msgPose.orientation.x:"<<msgPose.orientation.x<<std::endl;
+        std::cout<<"msgPose.orientation.y:"<<msgPose.orientation.y<<std::endl;
+        std::cout<<"msgPose.orientation.z:"<<msgPose.orientation.z<<std::endl;
+        std::cout<<"msgPose.orientation.w:"<<msgPose.orientation.w<<std::endl;
 
     }
+    sendImage(ImgMat);
     send(have,vecBear.size(),vecRabbit.size(),vecGiraffe.size(), rcoRate);
     return;
 }
@@ -199,17 +223,21 @@ bool CamraOperate::readClibrateData()
 
 bool CamraOperate::getDetesionResult(int x, int y, std::vector<double> &pose)
 {
-    int ret = -1;
+    int ret = -2;
     ret = Calib2D->getAffineResult(x, y, pose);
+    std::cout<<"getDetesionResult,ret:"<<ret<<std::endl;
     return ret == 0 ? true : false;
 }
 
-bool CamraOperate::opencvDrawing(int x, int y, int wide, int high)
+bool CamraOperate::opencvDrawing(int ax, int ay, int bx, int by,
+                                 cv::Mat &ImageMat,QString imgFile,
+                                 cv::String objName,cv::Scalar sca)
 {
     try{
-        cv::Rect rect(x,y,wide,high);
-        cv::rectangle(colorImg,rect,cv::Scalar(255, 0, 0),2,cv::LINE_8,0);
-        cv::imwrite(imgFileName,colorImg);
+        cv::Rect rect(cv::Point(ax,ay), cv::Point(bx,by));
+        cv::rectangle(ImageMat,rect,sca,3,cv::LINE_8,0);
+        cv::putText(ImageMat, objName,cv::Point(ax,ay),cv::FONT_HERSHEY_SIMPLEX ,2,sca, 2, 8);
+        cv::imwrite(imgFile.toStdString(),ImageMat);
     }catch(cv::Exception &e){
         ROS_ERROR("opencv exception: %s", e.what());
         return false;
@@ -217,4 +245,9 @@ bool CamraOperate::opencvDrawing(int x, int y, int wide, int high)
     return true;
 }
 
-
+bool CamraOperate::getCalibraHomeData()
+{
+    int ret  = -1;
+    ret = Calib2D->readEyeCalibHomParam(camCalibXmlFileName);
+    return ret == 0 ? true : false;
+}

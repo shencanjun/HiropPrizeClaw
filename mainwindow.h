@@ -41,6 +41,8 @@ private:
     QString calibXmlName;
     QString camImageFileName;
     QString camXmlFileName;
+    QString camADeteImgFile;
+    QString camSDeteImgFile;
 
     std::string progName;
     std::string robotIpStr;
@@ -60,6 +62,8 @@ private:
     std::vector<double> detesionRPose;
     ObjType objType;
     bool isdone;
+    bool haveObj;
+    bool movestop;
 
     double comX;
     double comY;
@@ -67,6 +71,8 @@ private:
     boost::thread *thrd;
     boost::thread *moveThrd;
     boost::thread *HscLocThrd;
+
+    int voiceState;
 
     bool hscThredflat;
 
@@ -87,10 +93,15 @@ public:
         emit emitHscLocData(data);
     }
 
+    void sendCamPoseData(LocData pose) const{
+        emit emitCamPoseData(pose);
+    }
+
 signals:
     void emitUIUpdata(QString str) const;
     void emitDetectionUIUpdata(double rx,double ry) const;
     void emitHscLocData(LocData) const;
+    void emitCamPoseData(LocData) const;
 
 public:
 
@@ -121,6 +132,8 @@ public:
     void StartPrizeClawBnt();
 
     void showVoiceRecognitionResult(QString str);
+
+    void voiceStatus();
 
     void getHscLocDataStart();
 
@@ -156,7 +169,7 @@ public:
 
     void selectObjCombobox(int index);
 
-    void LabelDisplayMat(QLabel *label, cv::Mat &mat);
+    void LabelDisplayMat(QLabel *label, cv::Mat mat);
 
     void setFrameInCenter();
 
@@ -165,6 +178,10 @@ public:
     void detectionDone(bool,int, int, int, double);
 
     void showDetectionRobotData(double rx, double ry);
+
+    bool getDetectionRobotPose();
+
+    void showCamPose(LocData data);
 
 private:
     void closeEvent(QCloseEvent *event);

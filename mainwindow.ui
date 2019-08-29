@@ -974,7 +974,7 @@ p, li { white-space: pre-wrap; }
                   <rect>
                    <x>180</x>
                    <y>50</y>
-                   <width>61</width>
+                   <width>81</width>
                    <height>31</height>
                   </rect>
                  </property>
@@ -990,7 +990,7 @@ p, li { white-space: pre-wrap; }
                   <rect>
                    <x>50</x>
                    <y>50</y>
-                   <width>61</width>
+                   <width>81</width>
                    <height>31</height>
                   </rect>
                  </property>
@@ -1032,7 +1032,7 @@ p, li { white-space: pre-wrap; }
                   <rect>
                    <x>180</x>
                    <y>130</y>
-                   <width>61</width>
+                   <width>81</width>
                    <height>31</height>
                   </rect>
                  </property>
@@ -1048,7 +1048,7 @@ p, li { white-space: pre-wrap; }
                   <rect>
                    <x>50</x>
                    <y>90</y>
-                   <width>61</width>
+                   <width>81</width>
                    <height>31</height>
                   </rect>
                  </property>
@@ -1077,7 +1077,7 @@ p, li { white-space: pre-wrap; }
                   <rect>
                    <x>180</x>
                    <y>90</y>
-                   <width>61</width>
+                   <width>81</width>
                    <height>31</height>
                   </rect>
                  </property>
@@ -1119,7 +1119,7 @@ p, li { white-space: pre-wrap; }
                   <rect>
                    <x>50</x>
                    <y>130</y>
-                   <width>61</width>
+                   <width>81</width>
                    <height>31</height>
                   </rect>
                  </property>
