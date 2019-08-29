@@ -60,8 +60,8 @@ private:
     void getObjectArray_callback(const vision_bridge::ObjectArray::ConstPtr &msg);
 
 public:
-    void send(bool have,int numBear, int numRabbit, int numGiraffe) const{
-        emit emitResultCam(have, numBear, numRabbit, numGiraffe);
+    void send(bool have,int numBear, int numRabbit, int numGiraffe,double rcoRate) const{
+        emit emitResultCam(have, numBear, numRabbit, numGiraffe ,rcoRate);
     }
 
     void sendImage(cv::Mat mat) const{
@@ -69,7 +69,7 @@ public:
     }
 
 signals:
-    void emitResultCam(bool, int , int , int) const;
+    void emitResultCam(bool, int , int , int, double) const;
     void emitImagesignal(cv::Mat) const;
 
 public:

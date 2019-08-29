@@ -586,7 +586,9 @@ void MainWindow::detectionThread()
 
     isdone = false;
 
-    getCamPose(objType);
+    if(!getCamPose(objType)){
+        return;
+    }
 
     if(!isDetesion){
         std::cout<< "识别失败："<<isDetesion<<std::endl;
@@ -602,40 +604,40 @@ void MainWindow::detectionThread()
     return;
 }
 
-void MainWindow::getCamPose(ObjType type)
+bool MainWindow::getCamPose(ObjType type)
 {
-    vector<geometry_msgs::Pose>::iterator k;
+    //vector<geometry_msgs::Pose>::iterator k;
     geometry_msgs::Pose pose;
 
     if(type == BEAR){
         if(camOpera->vecBear.size() <= 0){
             emitUIUpdata("<font color = red> 没有小熊了!!! </font>");
-            return;
+            return false;
         }
-        k = camOpera->vecBear.begin();
+        //k = camOpera->vecBear.begin();
         pose = camOpera->vecBear[0];
-        camOpera->vecBear.erase(k);
+        //camOpera->vecBear.erase(k);
     }
     else if(type == RABBIT){
         if(camOpera->vecRabbit.size() <= 0){
             emitUIUpdata("<font color = red> 没有小兔子了!!! </font>");
-            return;
+            return false;
         }
-        k = camOpera->vecRabbit.begin();
+        //k = camOpera->vecRabbit.begin();
         pose = camOpera->vecRabbit[0];
-        camOpera->vecRabbit.erase(k);
+        //camOpera->vecRabbit.erase(k);
     }
     else if(type == GIRAFFE){
         if(camOpera->vecGiraffe.size() <= 0){
             emitUIUpdata("<font color = red> 没有长颈鹿了!!! </font>");
-            return;
+            return false;
         }
-        k = camOpera->vecGiraffe.begin();
+        //k = camOpera->vecGiraffe.begin();
         pose = camOpera->vecGiraffe[0];
-        camOpera->vecGiraffe.erase(k);
+        //camOpera->vecGiraffe.erase(k);
     }
     else {
-        return;
+        return false;
     }
 
     //画框尺寸
@@ -662,11 +664,11 @@ void MainWindow::getCamPose(ObjType type)
         if(!camOpera->opencvDrawing(squareAX,squareAY,squareWidth,squareHeigth)){
             cv::Mat darw = cv::imread(camImageFileName.toStdString());
             showImageLabelChange(darw);
-            return;
+            return false;
         }
     }
     isdone = true;
-    return;
+    return true;
 }
 
 void MainWindow::startMove()
@@ -835,21 +837,23 @@ void MainWindow::showDetectionRobotData(double rx, double ry)
     }
 }
 
-void MainWindow::detectionDone(bool have, int numB, int numR, int numG)
+void MainWindow::detectionDone(bool have, int numB, int numR, int numG, double rcoRate)
 {
     if(!have){
         isdone = false;
         emitUIUpdata("<font color = red> 无识别物体!!! </font>");
         return;
     }
+    QString strRate = QString::number(rcoRate,'f',4);
     QString strB = QString::number(numB);
     QString strR = QString::number(numR);
     QString strG = QString::number(numG);
 
-    emitUIUpdata("<font color = red> 识别完成!!! </font>");
-    emitUIUpdata("<font color = red> 小熊：　"+strB+"!!! </font>");
-    emitUIUpdata("<font color = red> 小兔子："+strR+"!!! </font>");
-    emitUIUpdata("<font color = red> 长颈鹿："+strG+"!!! </font>");
+    emitUIUpdata("<font color = blue> 识别完成!!! </font>");
+    emitUIUpdata("<font color = blue> 识别率："+strRate+"!!! </font>");
+    emitUIUpdata("<font color = blue> 小熊：　"+strB+"!!! </font>");
+    emitUIUpdata("<font color = blue> 小兔子："+strR+"!!! </font>");
+    emitUIUpdata("<font color = blue> 长颈鹿："+strG+"!!! </font>");
 
     isdone = true;
     return;

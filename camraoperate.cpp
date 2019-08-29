@@ -118,10 +118,10 @@ void CamraOperate::getObjectArray_callback(const vision_bridge::ObjectArray::Con
     std::cout<<"getObjectArray"<<std::endl;
     geometry_msgs::Pose msgPose;
     bool have;
+    double rcoRate = 0;
     if(msg->objects.size() <= 0)
         return;
     for(int i=0;i<msg->objects.size();i++){
-        //resultPose.header.frame_id = msg->objects[i].name;
         msgPose = msg->objects[i].pose.pose;
 
         if(!static_cast<bool >(msgPose.position.x)){
@@ -129,19 +129,20 @@ void CamraOperate::getObjectArray_callback(const vision_bridge::ObjectArray::Con
             break;
         }
 
-        if(1){
+        if((static_cast<int >(msgPose.position.z)) == 1){
             vecBear.push_back(msgPose);
         }
-        else if(2){
+        else if((static_cast<int >(msgPose.position.z)) == 2){
             vecRabbit.push_back(msgPose);
         }
-        else if(3){
+        else if((static_cast<int >(msgPose.position.z)) == 3){
             vecGiraffe.push_back(msgPose);
         }
         else{
             ;
         }
         have = true;
+        rcoRate = msgPose.position.y;
         std::cout<<"resultPose.pose.x:"<<resultPose.pose.position.x<<std::endl;
         std::cout<<"resultPose.pose.y:"<<resultPose.pose.position.y<<std::endl;
         std::cout<<"resultPose.pose.z:"<<resultPose.pose.position.z<<std::endl;
@@ -151,7 +152,7 @@ void CamraOperate::getObjectArray_callback(const vision_bridge::ObjectArray::Con
         std::cout<<"resultPose.orientation.w:"<<resultPose.pose.orientation.w<<std::endl;
 
     }
-    send(have,vecBear.size(),vecRabbit.size(),vecGiraffe.size());
+    send(have,vecBear.size(),vecRabbit.size(),vecGiraffe.size(), rcoRate);
     return;
 }
 

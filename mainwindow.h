@@ -146,7 +146,7 @@ public:
 
     void detesionBnt();
 
-    void getCamPose(ObjType );
+    bool getCamPose(ObjType );
 
     void startMaulModeBnt();
 
@@ -162,7 +162,7 @@ public:
 
     void detectionThread();
 
-    void detectionDone(bool,int, int, int);
+    void detectionDone(bool,int, int, int, double);
 
     void showDetectionRobotData(double rx, double ry);
 
