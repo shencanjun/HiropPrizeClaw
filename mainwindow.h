@@ -183,6 +183,8 @@ public:
 
     void showCamPose(LocData data);
 
+    void updataImg();
+
 private:
     void closeEvent(QCloseEvent *event);
 };

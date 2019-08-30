@@ -497,9 +497,6 @@ void MainWindow::HscMsgStatusLET()
 
 void MainWindow::HscClearFaultBnt()
 {
-    //camOpera->opencvDrawing(20,20,100,200);
-    //cv::Mat darw = cv::imread(camImageFileName);
-    //showImageLabelChange(darw);
     if(!hsc3->HscClearFault())
     {
         setReturnStrtoUI("<font color = red> 机器人复位失败！！！ </font>");
@@ -562,26 +559,26 @@ void MainWindow::connectCamraBnt()
 void MainWindow::camTakePirtureBnt()
 {
     if(!camOpera->takePicture()){
-        setReturnStrtoUI("<font color = red> 相机拍照失败!!! </font>");
+        emitUIUpdata("<font color = red> 相机拍照失败!!! </font>");
         return;
     }
-    setReturnStrtoUI("<font color = green> 相机拍照成功!!! </font>");
+    emitUIUpdata("<font color = green> 相机拍照成功!!! </font>");
 
     if(!camOpera->getImage()){
-        setReturnStrtoUI("<font color = red> 获取图像!!! </font>");
+        emitUIUpdata("<font color = red> 获取图像!!! </font>");
         return;
     }
-    setReturnStrtoUI("<font color = green> 获取图像!!! </font>");
+    emitUIUpdata("<font color = green> 获取图像!!! </font>");
     return;
 }
 
 void MainWindow::camGetImageBnt()
 {
     if(!camOpera->getImage()){
-        setReturnStrtoUI("<font color = red> 获取图像!!! </font>");
+        emitUIUpdata("<font color = red> 获取图像!!! </font>");
         return;
     }
-    setReturnStrtoUI("<font color = green> 获取图像!!! </font>");
+    emitUIUpdata("<font color = green> 获取图像!!! </font>");
     return;
 }
 
@@ -725,14 +722,18 @@ void MainWindow::startMoveThrd()
     if(attemp >= 10){
         emitUIUpdata("<font color = red> 等待超时!!! </font>");
         voiceStatus();
+        updataImg();
         return;
     }
     if(!haveObj){
         voiceStatus();
+        updataImg();
         return;
     }
 
     attemp = 0;
+    hsc3->setHscR(10,0);
+    usleep(200000);
     hsc3->setHscR(10,1);
     do{
         hsc3->getHscR(11,value);
@@ -746,6 +747,7 @@ void MainWindow::startMoveThrd()
     {
         emitUIUpdata("<font color = green> 机器人到位失败!!! </font>");
         voiceStatus();
+        updataImg();
         return;
     }
     hsc3->setHscR(11,0);
@@ -762,6 +764,7 @@ void MainWindow::startMoveThrd()
     while(value == 1.0);
     emitUIUpdata("<font color = green> 抓取成功!!! </font>");
     voiceStatus();
+    updataImg();
     return;
 }
 
@@ -982,4 +985,9 @@ void MainWindow::showCamPose(LocData data)
     ui->label_CB->setText(QString::number(data[4],'f',4));
     ui->label_CC->setText(QString::number(data[5],'f',4));
     return;
+}
+
+void MainWindow::updataImg()
+{
+    camTakePirtureBnt();
 }
