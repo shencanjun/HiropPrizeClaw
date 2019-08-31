@@ -8,6 +8,9 @@
 #include <hirop_msgs/StopListen.h>
 #include "jsoncpp/json/json.h"
 #include <boost/thread.hpp>
+#include <ttsmsc.h>
+#include <qdebug.h>
+#include <QSound>
 
 enum ObjType{
     BEAR = 0,
@@ -39,8 +42,10 @@ signals:
 public:
     int startVoiceRecognition();
     int stopVoiceRecognition();
+    int textToSoundPlay(QString text,QString fileName = "./sound.wav");
 
 public:
+    Ttsmsc *msc;
     ros::NodeHandle nVoice;
     ros::ServiceClient clientSatrtListener;
     ros::ServiceClient clientStopListener;
@@ -49,7 +54,6 @@ public:
     std::string intentFormMsgstr;
 
     boost::thread *thrdVoice;
-    //boost::function0<void> voiceFun;
 };
 
 #endif // VOICERECOGNITE_H

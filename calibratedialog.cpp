@@ -52,9 +52,14 @@ void CalibrateDialog::readCalibrateData()
 
 void CalibrateDialog::startCalibration()
 {
+    if(!Chsc3->isConnectIPC()){
+        QMessageBox::warning(NULL, "提示", "<font color = red >请先连接机器人!!!</font>", QMessageBox::Yes);
+        return;
+    }
     if(!camCalib->startEyeCalirating())
     {
         QMessageBox::warning(NULL, "提示", "<font color = red >开始标定失败!!!</font>", QMessageBox::Yes);
+        return;
     }
 
     camCalib->getCalibrateImage();
@@ -66,6 +71,7 @@ void CalibrateDialog::startCalibration()
         ui->tableWidget->setItem(i, cColumnX, new QTableWidgetItem(QString::number(cx, 'f', 4)));
         ui->tableWidget->setItem(i, cColumnY, new QTableWidgetItem(QString::number(cy, 'f', 4)));
     }
+
     recordTimer->start(500);
     deleteTimer->start(500);
     return;
@@ -75,6 +81,10 @@ void CalibrateDialog::recordCalibrateData()
 {
     LocData data;
     std::vector<double> calData;
+    if(!Chsc3->isConnectIPC()){
+        QMessageBox::warning(NULL, "提示", "<font color = red >请先连接机器人!!!</font>", QMessageBox::Yes);
+        return;
+    }
     if(!Chsc3->getHscLoc(data)){
         std::cout<<"获取机器人笛卡尔坐标失败！！！"<<std::endl;
         QMessageBox::warning(NULL, "提示", "<font color = red >获取机器人笛卡尔坐标失败！！！</font>", QMessageBox::Yes);
@@ -159,6 +169,8 @@ void CalibrateDialog::SaveCalibration()
     sendCom();
     return;
 }
+
+
 
 void CalibrateDialog::startHscCalibrate()
 {

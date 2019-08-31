@@ -3,6 +3,7 @@
 VoiceRecognite::VoiceRecognite(ros::NodeHandle n)
 {
     nVoice = n;
+    msc = new Ttsmsc();
     clientSatrtListener = nVoice.serviceClient<hirop_msgs::StartListen>("start_listen");
     clientStopListener = nVoice.serviceClient<hirop_msgs::StopListen>("stop_listen");
 }
@@ -86,6 +87,21 @@ int VoiceRecognite::stopVoiceRecognition()
     {
         std::cout<<"stop listent faial!!!"<<std::endl;
     }
+    return 0;
+}
+
+int VoiceRecognite::textToSoundPlay(QString text, QString fileName)
+{
+    int ret = -1;
+    ret = msc->TtsLogin();
+    qDebug()<<"login ret = "<<ret;
+    qDebug()<<"textCur"<<text;
+    std::string Stext = text.toStdString();
+    std::string file = fileName.toStdString();
+    ret = msc->textToSpeech(file,Stext);
+    ret = msc->TtsLogout();
+    std::cout<<"正在播放"<<std::endl;
+    QSound::play(fileName);
     return 0;
 }
 

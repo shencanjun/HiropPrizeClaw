@@ -11,17 +11,18 @@ MainWindow::MainWindow(QWidget *parent) :
     qRegisterMetaType<cv::Mat>("cv::Mat");
     qRegisterMetaType<LocData>("LocData");
 
-    MainXmlFile = "/home/fshs/HiropPrizeClaw/build-HiropPrizeClaw-unknown-Debug/MainConfig.xml";
+   // MainXmlFile = "/home/fshs/HiropPrizeClaw/build-HiropPrizeClaw-unknown-Debug/MainConfig.xml";
 
     progName = "HIROP.PRG";
-    camImageFileName ="/home/fshs/show.jpg";
-    camADeteImgFile = "/home/fshs/Adetetion.jpg";
-    camSDeteImgFile = "/home/fshs/Sdetetion.jpg";
+    camImageFileName ="/home/fshs/PrizeClaw/show.jpg";
+    camADeteImgFile = "/home/fshs/prizeClaw/Adetetion.jpg";
+    camSDeteImgFile = "/home/fshs/prizeClaw/Sdetetion.jpg";
     camXmlFileName = "calibrate";
-    calibXmlName = "/home/fshs/calibrateData.xml";
+    calibXmlName = "/home/fshs/prizeClaw/calibrateData.xml";
 
     objType = BEAR;
     voiceState = 0;
+    clikedcount = 0;
 
     isDetesion = false;
     isdone = false;
@@ -34,6 +35,10 @@ MainWindow::MainWindow(QWidget *parent) :
     voice = new VoiceRecognite(n_MW);
     hsc3 = new HSC3ROBOT();
 
+    ttsDialog = new TtsMscDialog();
+    imgDialog = new ImageDialog();
+    imgDialog->initCamObj(camOpera);
+
     camOpera = new CamraOperate(n_MW);
     camOpera->imgFileName = camImageFileName.toStdString();
     camOpera->camCalibXmlFileName = camXmlFileName.toStdString();
@@ -45,7 +50,8 @@ MainWindow::MainWindow(QWidget *parent) :
     getHscMsgTimer = new QTimer(this);
     showgroupTimer = new QTimer(this);
 
-    //连接信号槽
+    ui->label_show_image->installEventFilter(this);
+    //信号槽
     connect(voice, &VoiceRecognite::emitResultStr,this,&MainWindow::showVoiceRecognitionResult);
     connect(camOpera, &CamraOperate::emitResultCam, this, &MainWindow::detectionDone);
     connect(camOpera, &CamraOperate::emitImagesignal, this, &MainWindow::showImageLabelChange);
@@ -54,11 +60,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, &MainWindow::emitDetectionUIUpdata, this, &MainWindow::showDetectionRobotData);
     connect(this, &MainWindow::emitHscLocData, this, &MainWindow::showHsrLocData);
     connect(this, &MainWindow::emitCamPoseData, this, &MainWindow::showCamPose);
+    connect(this, &MainWindow::emitsendImgData, imgDialog, &ImageDialog::reviceImg);
 
     connect(showgroupTimer, &QTimer::timeout, this, &MainWindow::setFrameInCenter);
     //connect(getHscMsgTimer, &QTimer::timeout, this, &MainWindow::HscMsgStatusLET);
 
     connect(ui->actionCalibrate,&QAction::triggered,this,&MainWindow::showClibrateDialog);
+    connect(ui->actionVoiceTts, &QAction::triggered,this,&MainWindow::showTtsMscDialog);
+    connect(ui->actiontImage,&QAction::triggered, this, &MainWindow::showImageDialog);
     connect(ui->pushButton_VoiceRecognition,&QPushButton::clicked,this,&MainWindow::OpenOrCloseVoiceRecognitionBnt);
     connect(ui->pushButton_connectRobot,&QPushButton::clicked,this,&MainWindow::connectHsRobotBnt);
     connect(ui->pushButton_ebnable,&QPushButton::clicked,this,&MainWindow::enanleHsRobotBnt);
@@ -101,7 +110,7 @@ void MainWindow::getRobotCom()
         setReturnStrtoUI("<font color = green> 获取补偿值成功 </font>");
         return;
     }
-    setReturnStrtoUI("<font color = red> 获取补偿值失败 </font>");
+    //setReturnStrtoUI("<font color = red> 获取补偿值失败 </font>");
     return;
 }
 
@@ -125,6 +134,17 @@ void MainWindow::readMainXml()
 
 void MainWindow::setReturnStrtoUI(QString str)
 {
+    QStringList strlist = str.split("<");
+    if(strlist.size() >= 1){
+        strlist = strlist[1].split(">");
+        if(strlist.size() >= 1){
+            for(int i=0;i<strlist.size();i++)
+            {
+                qDebug()<<strlist[i];
+            }
+            voice->textToSoundPlay(strlist[1]);
+        }
+    }
     ui->VoiceRecognition_ReSponseTxt->append(str);
     ui->VoiceRecognition_ReSponseTxt->moveCursor(QTextCursor::End);
     return;
@@ -137,6 +157,12 @@ void MainWindow::showClibrateDialog()
     calDialog->show();
 }
 
+void MainWindow::showTtsMscDialog()
+{
+    ttsDialog->setWindowTitle("语音合成");
+    ttsDialog->show();
+}
+
 void MainWindow::OpenOrCloseVoiceRecognitionBnt()
 {
     if(ui->pushButton_VoiceRecognition->text() == "开始语音识别")
@@ -144,6 +170,7 @@ void MainWindow::OpenOrCloseVoiceRecognitionBnt()
         setReturnStrtoUI("<font color = green size = 7> 开始语音识别...... </font>");
         ui->pushButton_VoiceRecognition->setText("停止语音识别");
         voice->startVoiceRecognition();
+        //voice->textToSoundPlay("开始语音识别");
         voiceState = 1;
     }
     else
@@ -151,6 +178,7 @@ void MainWindow::OpenOrCloseVoiceRecognitionBnt()
         setReturnStrtoUI("<font color = red size = 7> 停止语音识别...... </font>");
         ui->pushButton_VoiceRecognition->setText("开始语音识别");
         voice->stopVoiceRecognition();
+        //voice->textToSoundPlay("停止语音识别");
         voiceState = 2;
     }
     return;
@@ -334,8 +362,8 @@ void MainWindow::loadHSRobotPrgBnt()
 {
     if(ui->pushButton_Load->text() == "加载")
     {
-        hsc3->setHscMode(OP_T1);
-        hsc3->setHscVord(70);
+        hsc3->setHscMode(OP_AUT);
+        hsc3->setHscVord(20);
         if(hsc3->HscLoadPRG(progName) && HscStatus)
         {
 
@@ -516,7 +544,9 @@ void MainWindow::showImagelabel()
 
     camOpera->colorImg = cv::imread(path);
 
-    showImageLabelChange(camOpera->colorImg);
+    //showImageLabelChange(camOpera->colorImg);
+    camOpera->sendImage(camOpera->colorImg);
+    sendImg(camOpera->colorImg);
 
     return;
 }
@@ -857,6 +887,8 @@ void MainWindow::setFrameInCenter()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     calDialog->close();
+    ttsDialog->close();
+    imgDialog->close();
 //    QMessageBox::StandardButton button;
 //    button=QMessageBox::question(this,tr("退出程序"),QString(tr("确认退出程序")),QMessageBox::Yes|QMessageBox::No);
 //    if(button==QMessageBox::No)
@@ -869,6 +901,29 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //        event->accept(); // 接受退出信号，程序退出
 //    }
     return;
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == ui->label_show_image)//当事件发生在u1（为Qlabel型）控件上
+    {
+        if (event->type() == QEvent::MouseButtonDblClick)//当为双击事件时
+        {
+            clikedcount++;
+            if (clikedcount % 2 == 0) //此处为双击一次全屏，再双击一次退出
+            {
+                ui->label_show_image->setWindowFlags(Qt::Dialog);
+                ui->label_show_image->showMaximized();//全屏显示
+            }
+            else
+            {
+                ui->label_show_image->setWindowFlags(Qt::SubWindow);
+                ui->label_show_image->showNormal();//退出全屏
+            };
+
+        }
+        return QObject::eventFilter(obj, event);
+    }
 }
 
 void MainWindow::showDetectionRobotData(double rx, double ry)
@@ -990,4 +1045,11 @@ void MainWindow::showCamPose(LocData data)
 void MainWindow::updataImg()
 {
     camTakePirtureBnt();
+}
+
+
+void MainWindow::showImageDialog()
+{
+    imgDialog->show();
+    return;
 }

@@ -29,6 +29,8 @@ public:
 
     bool disconnectIPC();
 
+    bool isConnectIPC();
+
     bool setHscEnanle(bool en);
 
     bool getHscEnanle(bool& en);

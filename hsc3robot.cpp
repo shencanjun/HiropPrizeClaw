@@ -38,6 +38,11 @@ bool HSC3ROBOT::disconnectIPC()
     return ret == 0 ? true : false;
 }
 
+bool HSC3ROBOT::isConnectIPC()
+{
+    return comapi->isConnected();
+}
+
 bool HSC3ROBOT::setHscEnanle(bool en)
 {
     ret = proMotion->setGpEn(gpId,en);
