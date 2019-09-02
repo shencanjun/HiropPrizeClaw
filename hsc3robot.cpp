@@ -162,3 +162,46 @@ bool HSC3ROBOT::setHscMode(OpMode mode)
     return ret == 0 ? true : false;
 }
 
+bool HSC3ROBOT::sendProg(QString fileName)
+{
+    QString fullName = "sshpass -p 123456 scp ";
+    QString hostname = " gm@10.10.56.214:/usr/condey/hsc3_app/scircp/";
+    fullName.append(fileName);
+    fullName.append(hostname);
+
+    qDebug()<<"fullName:"<<fullName;
+
+    QByteArray bary = fullName.toLatin1();
+
+    const char *cmd = bary.data();
+    char* rester;
+    executeCMD(cmd, rester);
+    if(rester != "file")
+        return false;
+    return true;
+}
+
+void HSC3ROBOT::executeCMD(const char *cmd, char *result)
+{
+    char buf_ps[1024];
+    char ps[1024]={0};
+    FILE *ptr;
+    strcpy(ps, cmd);
+    if((ptr=popen(ps, "r"))!=NULL)
+    {
+        while(fgets(buf_ps, 1024, ptr)!=NULL)
+        {
+            // 可以通过这行来获取shell命令行中的每一行的输出
+            // printf("%s", buf_ps);
+            strcat(result, buf_ps);
+            if(strlen(result)>1024)
+                break;
+        }
+        pclose(ptr);
+        ptr = NULL;
+    }
+    else
+    {
+        printf("popen %s error\n", ps);
+    }
+}

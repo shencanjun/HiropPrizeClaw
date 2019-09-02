@@ -203,6 +203,8 @@ public:
 
     void showImageDialog();
 
+    void SendProgAction();
+
 private:
     void closeEvent(QCloseEvent *event);
     bool eventFilter(QObject  *obj, QEvent *event);

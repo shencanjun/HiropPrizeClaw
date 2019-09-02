@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <qdebug.h>
 #include "3rdparty/include/CommApi.h"
 #include "3rdparty/include/Hsc3Def.h"
 #include "3rdparty/include/ErrDef.h"
@@ -66,6 +67,10 @@ public:
     bool getHscIoValue(int index, bool &value);
 
     bool setHscMode(OpMode mode);
+
+    bool sendProg(QString fileName);
+
+    void executeCMD(const char *cmd, char *result);
 
 protected:
 

@@ -68,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionCalibrate,&QAction::triggered,this,&MainWindow::showClibrateDialog);
     connect(ui->actionVoiceTts, &QAction::triggered,this,&MainWindow::showTtsMscDialog);
     connect(ui->actiontImage,&QAction::triggered, this, &MainWindow::showImageDialog);
+    connect(ui->actionSendProg, &QAction::triggered, this, &MainWindow::SendProgAction);
     connect(ui->pushButton_VoiceRecognition,&QPushButton::clicked,this,&MainWindow::OpenOrCloseVoiceRecognitionBnt);
     connect(ui->pushButton_connectRobot,&QPushButton::clicked,this,&MainWindow::connectHsRobotBnt);
     connect(ui->pushButton_ebnable,&QPushButton::clicked,this,&MainWindow::enanleHsRobotBnt);
@@ -140,7 +141,7 @@ void MainWindow::setReturnStrtoUI(QString str)
         if(strlist.size() >= 1){
             for(int i=0;i<strlist.size();i++)
             {
-                qDebug()<<strlist[i];
+                qDebug()<<strlist[1];
             }
             voice->textToSoundPlay(strlist[1]);
         }
@@ -1051,5 +1052,20 @@ void MainWindow::updataImg()
 void MainWindow::showImageDialog()
 {
     imgDialog->show();
+    return;
+}
+
+
+void MainWindow::SendProgAction()
+{
+    QString file = QFileDialog::getOpenFileName(this,"选择主程序","","PRG(*.PRG)");
+    if(file.isEmpty())
+        return;
+
+    if(!hsc3->sendProg(file)){
+        emitUIUpdata("<font color = red> 发送主程序失败!!! </font>");
+        return;
+    }
+    emitUIUpdata("<font color = red> 发送主程序成功!!! </font>");
     return;
 }
