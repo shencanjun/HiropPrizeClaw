@@ -66,6 +66,7 @@ int VoiceRecognite::startVoiceRecognition()
     clientSatrtListener.call(startListen);
     if(startListen.response.reuslt == 0)
     {
+        msc->TtsLogin();
         std::cout<<"start listen succeeful!!!"<<std::endl;
     }
     else
@@ -81,6 +82,7 @@ int VoiceRecognite::stopVoiceRecognition()
     clientStopListener.call(stopListen);
     if(stopListen.response.reuslt == 0)
     {
+        msc->TtsLogout();
         std::cout<<"stop listen succeeful!!!"<<std::endl;
     }
     else
@@ -93,16 +95,18 @@ int VoiceRecognite::stopVoiceRecognition()
 int VoiceRecognite::textToSoundPlay(QString text, QString fileName)
 {
     int ret = -1;
-    ret = msc->TtsLogin();
-    qDebug()<<"login ret = "<<ret;
     qDebug()<<"textCur"<<text;
     std::string Stext = text.toStdString();
     std::string file = fileName.toStdString();
     ret = msc->textToSpeech(file,Stext);
-    ret = msc->TtsLogout();
     std::cout<<"正在播放"<<std::endl;
     QSound::play(fileName);
     return 0;
 }
 
+int VoiceRecognite::voiceConfirm(QString con)
+{
+
+
+}
 
