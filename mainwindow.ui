@@ -1274,6 +1274,9 @@ QWidget:focus{outline: none;}</string>
     </property>
     <addaction name="actionCalibrate"/>
     <addaction name="actionOpenImage"/>
+    <addaction name="actionSendProg"/>
+    <addaction name="actionVoiceTts"/>
+    <addaction name="actiontImage"/>
    </widget>
    <addaction name="menuHIRO"/>
   </widget>
@@ -1285,6 +1288,21 @@ QWidget:focus{outline: none;}</string>
   <action name="actionOpenImage">
    <property name="text">
     <string>打开</string>
+   </property>
+  </action>
+  <action name="actionVoiceTts">
+   <property name="text">
+    <string>语音合成</string>
+   </property>
+  </action>
+  <action name="actiontImage">
+   <property name="text">
+    <string>图像全屏</string>
+   </property>
+  </action>
+  <action name="actionSendProg">
+   <property name="text">
+    <string>发送主程序</string>
    </property>
   </action>
  </widget>

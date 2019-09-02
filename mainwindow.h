@@ -8,8 +8,13 @@
 #include <sstream>
 #include <QEvent>
 #include <QCloseEvent>
+#include <QMouseEvent>
+#include <QSound>
+#include <QDebug>
 #include <boost/thread.hpp>
 #include "calibratedialog.h"
+#include "ttsmscdialog.h"
+#include "imagedialog.h"
 #include "voicerecognite.h"
 #include "hsc3robot.h"
 #include "camraoperate.h"
@@ -30,6 +35,8 @@ public:
 private:
     Ui::MainWindow *ui;
     CalibrateDialog *calDialog;
+    TtsMscDialog *ttsDialog;
+    ImageDialog *imgDialog;
     VoiceRecognite *voice;
     ParseConfig *parse;
     ros::NodeHandle n_MW;
@@ -68,6 +75,8 @@ private:
     double comX;
     double comY;
 
+    int clikedcount;
+
     boost::thread *thrd;
     boost::thread *moveThrd;
     boost::thread *HscLocThrd;
@@ -97,11 +106,16 @@ public:
         emit emitCamPoseData(pose);
     }
 
+    void sendImg(cv::Mat mat) const{
+        emit emitsendImgData(mat);
+    }
+
 signals:
     void emitUIUpdata(QString str) const;
     void emitDetectionUIUpdata(double rx,double ry) const;
     void emitHscLocData(LocData) const;
     void emitCamPoseData(LocData) const;
+    void emitsendImgData(cv::Mat) const;
 
 public:
 
@@ -185,8 +199,15 @@ public:
 
     void updataImg();
 
+    void showTtsMscDialog();
+
+    void showImageDialog();
+
+    void SendProgAction();
+
 private:
     void closeEvent(QCloseEvent *event);
+    bool eventFilter(QObject  *obj, QEvent *event);
 };
 
 #endif // MAINWINDOW_H
