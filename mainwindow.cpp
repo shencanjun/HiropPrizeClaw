@@ -334,8 +334,8 @@ void MainWindow::loadHSRobotPrgBnt()
 {
     if(ui->pushButton_Load->text() == "加载")
     {
-        hsc3->setHscMode(OP_T1);
-        hsc3->setHscVord(70);
+        hsc3->setHscMode(OP_AUT);
+        hsc3->setHscVord(20);
         if(hsc3->HscLoadPRG(progName) && HscStatus)
         {
 
