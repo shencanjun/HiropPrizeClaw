@@ -4,8 +4,6 @@ VoiceRecognite::VoiceRecognite(ros::NodeHandle n)
 {
     nVoice = n;
     msc = new Ttsmsc();
-    clientSatrtListener = nVoice.serviceClient<hirop_msgs::StartListen>("start_listen");
-    clientStopListener = nVoice.serviceClient<hirop_msgs::StopListen>("stop_listen");
 }
 
 VoiceRecognite::~VoiceRecognite()
@@ -62,6 +60,8 @@ void VoiceRecognite::parseIntent(std::string &data)
 int VoiceRecognite::startVoiceRecognition()
 {
     hirop_msgs::StartListen startListen;
+    clientSatrtListener = nVoice.serviceClient<hirop_msgs::StartListen>("start_listen");
+    clientStopListener = nVoice.serviceClient<hirop_msgs::StopListen>("stop_listen");
     subUserIntent = nVoice.subscribe("/user_intent",1,&VoiceRecognite::listenVoice_callback,this);
     clientSatrtListener.call(startListen);
     if(startListen.response.reuslt == 0)
