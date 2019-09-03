@@ -22,7 +22,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     objType = BEAR;
     voiceState = 0;
+    voiceStep = 0;
     clikedcount = 0;
+    stepFlag = false;
+    steptime = 100;//10s
 
     isDetesion = false;
     isdone = false;
@@ -135,17 +138,17 @@ void MainWindow::readMainXml()
 
 void MainWindow::setReturnStrtoUI(QString str)
 {
-    QStringList strlist = str.split("<");
-    if(strlist.size() >= 1){
-        strlist = strlist[1].split(">");
-        if(strlist.size() >= 1){
-            for(int i=0;i<strlist.size();i++)
-            {
-                qDebug()<<strlist[1];
-            }
-            voice->textToSoundPlay(strlist[1]);
-        }
-    }
+//    QStringList strlist = str.split("<");
+//    if(strlist.size() >= 1){
+//        strlist = strlist[1].split(">");
+//        if(strlist.size() >= 1){
+//            for(int i=0;i<strlist.size();i++)
+//            {
+//                qDebug()<<strlist[1];
+//            }
+//            voice->textToSoundPlay(strlist[1]);
+//        }
+//    }
     ui->VoiceRecognition_ReSponseTxt->append(str);
     ui->VoiceRecognition_ReSponseTxt->moveCursor(QTextCursor::End);
     return;
@@ -187,24 +190,83 @@ void MainWindow::OpenOrCloseVoiceRecognitionBnt()
 
 void MainWindow::showVoiceRecognitionResult(QString str)
 {
-    //QString pstr = ""+str;
-    setReturnStrtoUI("抓取：<font color = blue size = 10>"+str+"</font>" );
-    if(str== "熊"){
-        selectObjCombobox(0);
+    switch (voiceStep) {
+    case 0:
+        if(str != "嘿华数")
+            return;
+        voice->textToSoundPlay("你好！请选择你喜欢的动物娃娃，并告诉我...");
+        voiceStep = 1;
+        stepFlag = true;
+        voiceStepReset();
+        break;
+    case 1:
+        stepFlag = false;
+        voice->textToSoundPlay("你的选择为："+ str +"请确认");
+        if(str== "熊"){
+            objType = BEAR;
+        }
+        else if(str == "兔"){
+            objType = RABBIT;
+        }
+        else if(str == "长颈鹿"){
+            objType = GIRAFFE;
+        }
+        else{
+            break;
+        }
+        voice->textToSoundPlay("你的选择为："+ str +"请您确认");
+        voiceStep = 2;
+        stepFlag = true;
+        voiceStepReset();
+        break;
+    case 2:
+        stepFlag = false;
+        if(str == "确认"){
+            voice->textToSoundPlay("当前选择的娃娃为："+ str + "请再次确认");
+            voiceStep = 3;
+        }
+        else if(str == "不确认"){
+            voice->textToSoundPlay("请重新选择你喜欢动物娃娃");
+            voiceStep = 1;
+        }
+        break;
+        stepFlag = true;
+        voiceStepReset();
+    case 3:
+        stepFlag = false;
+        if(objType == BEAR){
+            setReturnStrtoUI("抓取：<font color = blue size = 10> 小熊 </font>" );
+            voice->textToSoundPlay("正在为您抓取小熊");
+            selectObjCombobox(0);
+            stepFlag = true;
+            voiceStepReset();
+        }
+        else if(objType == RABBIT){
+            setReturnStrtoUI("抓取：<font color = blue size = 10> 小兔子 </font>" );
+            voice->textToSoundPlay("正在为您抓取小熊");
+            selectObjCombobox(1);
+        }
+        else if(objType == GIRAFFE){
+            setReturnStrtoUI("抓取：<font color = blue size = 10> 长颈鹿 </font>" );
+            voice->textToSoundPlay("正在为您抓取小熊");
+            selectObjCombobox(2);
+        }
+        else{
+            return;
+        }
+        voice->stopVoiceRecognition();
+        voiceState = 2;
+        startMove();
+        voiceStep = 0;
+        stepFlag = true;
+        voiceStepReset();
+        break;
+    default:
+        voiceStep = 0;
+        break;
     }
-    else if(str == "兔"){
-        selectObjCombobox(1);
-    }
-    else if(str == "长颈鹿"){
-        selectObjCombobox(2);
-    }
-    else{
-        return;
-    }
-    voice->stopVoiceRecognition();
-    voiceState = 2;
-    startMove();
     return;
+    //QString pstr = ""+str;
 }
 
 void MainWindow::readRobotConfig()
@@ -671,6 +733,7 @@ bool MainWindow::getCamPose(ObjType type)
     if(type == BEAR){
         if(camOpera->vecBear.size() <= 0){
             emitUIUpdata("<font color = red> 没有小熊了!!! </font>");
+            voice->textToSoundPlay("没有小熊了!");
             return false;
         }
         pose = camOpera->vecBear[0];
@@ -679,6 +742,7 @@ bool MainWindow::getCamPose(ObjType type)
     else if(type == RABBIT){
         if(camOpera->vecRabbit.size() <= 0){
             emitUIUpdata("<font color = red> 没有小兔子了!!! </font>");
+            voice->textToSoundPlay("没有小兔子了!");
             return false;
         }
         pose = camOpera->vecRabbit[0];
@@ -687,6 +751,7 @@ bool MainWindow::getCamPose(ObjType type)
     else if(type == GIRAFFE){
         if(camOpera->vecGiraffe.size() <= 0){
             emitUIUpdata("<font color = red> 没有长颈鹿了!!! </font>");
+            voice->textToSoundPlay("没有长颈鹿了!");
             return false;
         }
         pose = camOpera->vecGiraffe[0];
@@ -1028,6 +1093,7 @@ void MainWindow::voiceStatus()
     if(voiceState = 2){
         voice->startVoiceRecognition();
         voiceState = 1;
+        voiceStep = 0;
     }
     return;
 }
@@ -1067,5 +1133,26 @@ void MainWindow::SendProgAction()
         return;
     }
     emitUIUpdata("<font color = green> 发送主程序成功!!! </font>");
+    return;
+}
+
+
+void MainWindow::voiceStepReset()
+{
+    boost::function0 <void > f = boost::bind(&MainWindow::voiceSteoResetThrd, this);
+    setpThrd = new boost::thread(f);
+}
+
+void MainWindow::voiceSteoResetThrd()
+{
+    int count = 0;
+    while(stepFlag && count <= steptime){
+        usleep(100000);
+        count++;
+    }
+    if(count >= steptime){
+        voiceStep = 0;
+        stepFlag = false;
+    }
     return;
 }

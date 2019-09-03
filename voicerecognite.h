@@ -43,6 +43,7 @@ public:
     int startVoiceRecognition();
     int stopVoiceRecognition();
     int textToSoundPlay(QString text,QString fileName = "./sound.wav");
+    int voiceConfirm(QString);
 
 public:
     Ttsmsc *msc;

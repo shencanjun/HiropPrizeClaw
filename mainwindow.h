@@ -71,6 +71,8 @@ private:
     bool isdone;
     bool haveObj;
     bool movestop;
+    bool stepFlag;
+    int steptime;
 
     double comX;
     double comY;
@@ -80,10 +82,13 @@ private:
     boost::thread *thrd;
     boost::thread *moveThrd;
     boost::thread *HscLocThrd;
+    boost::thread *setpThrd;
 
     int voiceState;
 
     bool hscThredflat;
+
+    int voiceStep;
 
 public:
     HSC3ROBOT *hsc3;
@@ -204,6 +209,10 @@ public:
     void showImageDialog();
 
     void SendProgAction();
+
+    void voiceStepReset();
+
+    void voiceSteoResetThrd();
 
 private:
     void closeEvent(QCloseEvent *event);
