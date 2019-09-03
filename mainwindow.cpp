@@ -14,11 +14,11 @@ MainWindow::MainWindow(QWidget *parent) :
    // MainXmlFile = "/home/fshs/HiropPrizeClaw/build-HiropPrizeClaw-unknown-Debug/MainConfig.xml";
 
     progName = "HIROP.PRG";
-    camImageFileName ="/home/fshs/PrizeClaw/show.jpg";
-    camADeteImgFile = "/home/fshs/prizeClaw/Adetetion.jpg";
-    camSDeteImgFile = "/home/fshs/prizeClaw/Sdetetion.jpg";
+    camImageFileName ="./show.jpg";
+    camADeteImgFile = "./Adetetion.jpg";
+    camSDeteImgFile = "./Sdetetion.jpg";
     camXmlFileName = "calibrate";
-    calibXmlName = "/home/fshs/prizeClaw/calibrateData.xml";
+    calibXmlName = "./calibrateData.xml";
 
     objType = BEAR;
     voiceState = 0;
@@ -531,7 +531,7 @@ void MainWindow::HscClearFaultBnt()
         setReturnStrtoUI("<font color = red> 机器人复位失败！！！ </font>");
         return;
     }
-    setReturnStrtoUI("<font color = red> 机器人复位成功！！！ </font>");
+    setReturnStrtoUI("<font color = green> 机器人复位成功！！！ </font>");
     return;
 }
 
@@ -1058,7 +1058,7 @@ void MainWindow::showImageDialog()
 
 void MainWindow::SendProgAction()
 {
-    QString file = QFileDialog::getOpenFileName(this,"选择主程序","","PRG(*.PRG)");
+    QString file = QFileDialog::getOpenFileName(this,"选择主程序","../HiropPrizeClaw/","PRG(*.PRG)");
     if(file.isEmpty())
         return;
 
@@ -1066,6 +1066,6 @@ void MainWindow::SendProgAction()
         emitUIUpdata("<font color = red> 发送主程序失败!!! </font>");
         return;
     }
-    emitUIUpdata("<font color = red> 发送主程序成功!!! </font>");
+    emitUIUpdata("<font color = green> 发送主程序成功!!! </font>");
     return;
 }

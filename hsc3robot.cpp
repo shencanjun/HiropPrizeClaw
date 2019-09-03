@@ -165,7 +165,7 @@ bool HSC3ROBOT::setHscMode(OpMode mode)
 bool HSC3ROBOT::sendProg(QString fileName)
 {
     QString fullName = "sshpass -p 123456 scp ";
-    QString hostname = " gm@10.10.56.214:/usr/condey/hsc3_app/scircp/";
+    QString hostname = " gm@10.10.56.214:/usr/codesys/hsc3_app/script/";
     fullName.append(fileName);
     fullName.append(hostname);
 
@@ -175,13 +175,13 @@ bool HSC3ROBOT::sendProg(QString fileName)
 
     const char *cmd = bary.data();
     char* rester;
-    executeCMD(cmd, rester);
-    if(rester != "file")
+    if(!executeCMD(cmd, rester)){
         return false;
+    }
     return true;
 }
 
-void HSC3ROBOT::executeCMD(const char *cmd, char *result)
+bool HSC3ROBOT::executeCMD(const char *cmd, char *result)
 {
     char buf_ps[1024];
     char ps[1024]={0};
@@ -189,10 +189,11 @@ void HSC3ROBOT::executeCMD(const char *cmd, char *result)
     strcpy(ps, cmd);
     if((ptr=popen(ps, "r"))!=NULL)
     {
+        std::cout<<11111<<std::endl;
         while(fgets(buf_ps, 1024, ptr)!=NULL)
         {
             // 可以通过这行来获取shell命令行中的每一行的输出
-            // printf("%s", buf_ps);
+            std::cout<<"buf_ps:"<<buf_ps<<std::endl;
             strcat(result, buf_ps);
             if(strlen(result)>1024)
                 break;
@@ -202,6 +203,9 @@ void HSC3ROBOT::executeCMD(const char *cmd, char *result)
     }
     else
     {
+        std::cout<<2222222<<std::endl;
         printf("popen %s error\n", ps);
+        return false;
     }
+    return true;
 }

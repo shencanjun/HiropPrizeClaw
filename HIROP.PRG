@@ -1,0 +1,37 @@
+<attr>
+VERSION:0
+GROUP:[0]
+<end>
+<pos>
+<end>
+<program>
+
+J LR[11]
+R[10] = 0
+LBL[1]
+WAIT TIME = 500
+IF R[10]=0  , GOTO LBL[1]
+IF R[10]=1  , GOTO LBL[2]
+LBL[2]
+R[11] = 1
+J LR[11]
+DO[31] = OFF
+J LR[12] CNT=50
+J LR[13] CNT=50
+L LR[14]
+WAIT TIME = 500
+DO[31] = ON
+L LR[13] CNT=50
+J LR[12] CNT=50
+J LR[11] CNT=50
+J LR[10] CNT=50
+J LR[8] CNT=50
+J LR[9] 
+WAIT TIME = 500
+DO[31] = OFF
+J LR[8]  CNT=50
+J LR[10] CNT=50
+J LR[11] CNT=50
+R[10] = 0
+GOTO LBL[1]
+<end>

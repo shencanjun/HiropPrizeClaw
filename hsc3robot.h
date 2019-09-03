@@ -70,7 +70,7 @@ public:
 
     bool sendProg(QString fileName);
 
-    void executeCMD(const char *cmd, char *result);
+    bool executeCMD(const char *cmd, char *result);
 
 protected:
 

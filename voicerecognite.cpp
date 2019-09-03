@@ -94,8 +94,6 @@ int VoiceRecognite::textToSoundPlay(QString text, QString fileName)
 {
     int ret = -1;
     ret = msc->TtsLogin();
-    qDebug()<<"login ret = "<<ret;
-    qDebug()<<"textCur"<<text;
     std::string Stext = text.toStdString();
     std::string file = fileName.toStdString();
     ret = msc->textToSpeech(file,Stext);
