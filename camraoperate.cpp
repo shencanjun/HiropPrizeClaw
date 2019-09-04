@@ -10,7 +10,7 @@ CamraOperate::CamraOperate(ros::NodeHandle n)
 
 CamraOperate::~CamraOperate()
 {
-
+    delete Calib2D;
 }
 
 void CamraOperate::startCamraService()
@@ -164,19 +164,18 @@ void CamraOperate::getObjectArray_callback(const vision_bridge::ObjectArray::Con
         have = true;
         rcoRate = msgPose.position.y;
 
-
-
-        std::cout<<"msgPose.pose.x:"<<msgPose.position.x<<std::endl;
-        std::cout<<"msgPose.pose.y:"<<msgPose.position.y<<std::endl;
-        std::cout<<"msgPose.pose.z:"<<msgPose.position.z<<std::endl;
-        std::cout<<"msgPose.orientation.x:"<<msgPose.orientation.x<<std::endl;
-        std::cout<<"msgPose.orientation.y:"<<msgPose.orientation.y<<std::endl;
-        std::cout<<"msgPose.orientation.z:"<<msgPose.orientation.z<<std::endl;
-        std::cout<<"msgPose.orientation.w:"<<msgPose.orientation.w<<std::endl;
+//        std::cout<<"msgPose.pose.x:"<<msgPose.position.x<<std::endl;
+//        std::cout<<"msgPose.pose.y:"<<msgPose.position.y<<std::endl;
+//        std::cout<<"msgPose.pose.z:"<<msgPose.position.z<<std::endl;
+//        std::cout<<"msgPose.orientation.x:"<<msgPose.orientation.x<<std::endl;
+//        std::cout<<"msgPose.orientation.y:"<<msgPose.orientation.y<<std::endl;
+//        std::cout<<"msgPose.orientation.z:"<<msgPose.orientation.z<<std::endl;
+//        std::cout<<"msgPose.orientation.w:"<<msgPose.orientation.w<<std::endl;
 
     }
     sendImage(ImgMat);
     send(have,vecBear.size(),vecRabbit.size(),vecGiraffe.size(), rcoRate);
+    ImgMat.release();
     return;
 }
 

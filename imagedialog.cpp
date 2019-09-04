@@ -7,12 +7,13 @@ ImageDialog::ImageDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     qRegisterMetaType<cv::Mat>("cv::Mat");
-    connect(camOper, &CamraOperate::emitImagesignal, this, &ImageDialog::reviceImg);
+    ui->label->installEventFilter(this);
     //showImageLabel();
 }
 
 ImageDialog::~ImageDialog()
 {
+    delete camOper;
     delete ui;
 }
 
@@ -30,7 +31,7 @@ void ImageDialog::showImageLabel()
 //    //ui->label->clear();
 //    LabelDisplayMat(ui->label,mat1);
 
-    cv::Mat mat1 = cv::imread("/home/ros/2.png");
+    //cv::Mat mat1 = cv::imread("/home/ros/2.png");
 
 
     return;
@@ -39,11 +40,13 @@ void ImageDialog::showImageLabel()
 void ImageDialog::reviceImg(cv::Mat mat)
 {
     std::cout<<"ni hao ni hao"<<std::endl;
-    cv::imwrite("/home/ros/3.png",mat);
-    QPixmap *pixmap = new QPixmap("/home/ros/3.png");
+    cv::imwrite("./imgDialog.jpg",mat);
+    QPixmap *pixmap = new QPixmap("./imgDialog.jpg");
     pixmap->scaled(ui->label->size(), Qt::KeepAspectRatio);
     ui->label->setScaledContents(true);
     ui->label->setPixmap(*pixmap);
+    mat.release();
+    delete pixmap;
     return;
 }
 
@@ -69,5 +72,36 @@ void ImageDialog::LabelDisplayMat(QLabel *label, cv::Mat mat)
 
     label->setPixmap(nimp);
 
+    mat.release();
+    Rgb.release();
+
     return;
+}
+
+
+bool ImageDialog::eventFilter(QObject  *obj, QEvent *event)
+{
+    if (obj == ui->label)//当事件发生在u1（为Qlabel型）控件上
+    {
+        if (event->type() == QEvent::MouseButtonDblClick)//当为双击事件时
+        {
+            sendclose();
+            std::cout<<"ni hao ni hao"<<std::endl;
+//            clikedcount++;
+//            if (clikedcount % 2 == 0) //此处为双击一次全屏，再双击一次退出
+//            {
+//                //ui->label_show_image->setWindowFlags(Qt::Dialog);
+//                //ui->label_show_image->showMaximized();//全屏显示
+
+//            }
+//            else
+//            {
+//                //imgDialog->close();
+//                //ui->label_show_image->setWindowFlags(Qt::SubWindow);
+//                //ui->label_show_image->showNormal();//退出全屏
+//            };
+
+        }
+        return QObject::eventFilter(obj, event);
+    }
 }

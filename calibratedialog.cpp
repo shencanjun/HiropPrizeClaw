@@ -29,6 +29,12 @@ CalibrateDialog::CalibrateDialog(QWidget *parent) :
 
 CalibrateDialog::~CalibrateDialog()
 {
+    delete action;
+    delete parse;
+    delete recordTimer;
+    delete deleteTimer;
+    delete Chsc3;
+    delete camCalib;
     delete ui;
 }
 

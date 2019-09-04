@@ -34,6 +34,7 @@ TtsMscDialog::TtsMscDialog(QWidget *parent) :
 
 TtsMscDialog::~TtsMscDialog()
 {
+    //delete msc;
     delete ui;
 }
 

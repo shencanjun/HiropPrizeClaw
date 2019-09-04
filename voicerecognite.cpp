@@ -8,7 +8,7 @@ VoiceRecognite::VoiceRecognite(ros::NodeHandle n)
 
 VoiceRecognite::~VoiceRecognite()
 {
-
+    //delete msc;
 }
 
 void VoiceRecognite::listenVoice_callback(const std_msgs::String::ConstPtr& msg)
@@ -102,11 +102,5 @@ int VoiceRecognite::textToSoundPlay(QString text, QString fileName)
     std::cout<<"正在播放"<<std::endl;
     QSound::play(fileName);
     return 0;
-}
-
-int VoiceRecognite::voiceConfirm(QString con)
-{
-
-
 }
 

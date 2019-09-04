@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QLabel>
+#include <QMouseEvent>
 #include <opencv2/opencv.hpp>
 #include "camraoperate.h"
 
@@ -25,6 +26,17 @@ public:
     void showImageLabel();
 
     void LabelDisplayMat(QLabel *label, cv::Mat mat);
+
+public:
+    void sendclose() const{
+        emit emitCloseSignal();
+    }
+
+signals:
+    void emitCloseSignal() const;
+
+private:
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private:
     Ui::ImageDialog *ui;

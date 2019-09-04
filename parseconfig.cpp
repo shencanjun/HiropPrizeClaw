@@ -86,6 +86,7 @@ bool ParseConfig::readMainXml(QString fileName,QString StartElementStr, QString 
         std::cout<<"XML file format error."<<std::endl;
         xmlMReader.raiseError("XML file format error 22 .");
     }
+    delete file;
     return true;
 }
 
@@ -110,6 +111,7 @@ bool ParseConfig::readCalibXML(QString fileName, double &acc, double &comx, doub
     comx = comx_;
     comy = comy_;
 
+    delete file;
     return !xmlReader.error();
 }
 

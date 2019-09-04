@@ -64,9 +64,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, &MainWindow::emitHscLocData, this, &MainWindow::showHsrLocData);
     connect(this, &MainWindow::emitCamPoseData, this, &MainWindow::showCamPose);
     connect(this, &MainWindow::emitsendImgData, imgDialog, &ImageDialog::reviceImg);
+    connect(imgDialog, &ImageDialog::emitCloseSignal, this, &MainWindow::closeImageDialog);
+
+    connect(camOpera, &CamraOperate::emitImagesignal, imgDialog, &ImageDialog::reviceImg);
 
     connect(showgroupTimer, &QTimer::timeout, this, &MainWindow::setFrameInCenter);
-    //connect(getHscMsgTimer, &QTimer::timeout, this, &MainWindow::HscMsgStatusLET);
 
     connect(ui->actionCalibrate,&QAction::triggered,this,&MainWindow::showClibrateDialog);
     connect(ui->actionVoiceTts, &QAction::triggered,this,&MainWindow::showTtsMscDialog);
@@ -74,8 +76,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionSendProg, &QAction::triggered, this, &MainWindow::SendProgAction);
     connect(ui->pushButton_VoiceRecognition,&QPushButton::clicked,this,&MainWindow::OpenOrCloseVoiceRecognitionBnt);
     connect(ui->pushButton_connectRobot,&QPushButton::clicked,this,&MainWindow::connectHsRobotBnt);
-    connect(ui->pushButton_ebnable,&QPushButton::clicked,this,&MainWindow::enanleHsRobotBnt);
-    connect(ui->pushButton_Load,&QPushButton::clicked,this,&MainWindow::loadHSRobotPrgBnt);
+    //connect(ui->pushButton_ebnable,&QPushButton::clicked,this,&MainWindow::enanleHsRobotBnt);
+    //connect(ui->pushButton_Load,&QPushButton::clicked,this,&MainWindow::loadHSRobotPrgBnt);
     connect(ui->pushButton_start,&QPushButton::clicked,this,&MainWindow::HsRobotStartBnt);
     connect(ui->pushButton_result_set,&QPushButton::clicked,this,&MainWindow::setResultHsrLR);
     connect(ui->pushButton_clearFault, &QPushButton::clicked, this, &MainWindow::HscClearFaultBnt);
@@ -95,6 +97,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    stepFlag = false;
+    hscMsgThrdFlag = false;
+    hscThredflat = false;
+    delete showgroupTimer;
+    delete getHscMsgTimer;
+    delete camOpera;
+    delete imgDialog;
+    delete ttsDialog;
+    delete hsc3;
     delete parse;
     delete voice;
     delete calDialog;
@@ -196,12 +207,12 @@ void MainWindow::showVoiceRecognitionResult(QString str)
             return;
         voice->textToSoundPlay("你好！请选择你喜欢的动物娃娃，并告诉我...");
         voiceStep = 1;
-        stepFlag = true;
+        //stepFlag = true;
+        emitUIUpdata("voiceStep = 1");
         voiceStepReset();
         break;
     case 1:
         stepFlag = false;
-        voice->textToSoundPlay("你的选择为："+ str +"请确认");
         if(str== "熊"){
             objType = BEAR;
         }
@@ -215,51 +226,71 @@ void MainWindow::showVoiceRecognitionResult(QString str)
             break;
         }
         voice->textToSoundPlay("你的选择为："+ str +"请您确认");
+        emitUIUpdata("<font color = green>你的选择为：</font> <font color = blue size = 10>"+ str +" </font> <font color = green size = 5> 请您确认</font>");
         voiceStep = 2;
-        stepFlag = true;
+        emitUIUpdata("voiceStep = 2");
+        //stepFlag = true;
         voiceStepReset();
         break;
     case 2:
         stepFlag = false;
         if(str == "确认"){
+            emitUIUpdata("<font color = green>当前选择的娃娃为：</font> <font color = blue size = 10>"+ str +" </font> <font color = green size = 5>请再次确认</font>");
             voice->textToSoundPlay("当前选择的娃娃为："+ str + "请再次确认");
             voiceStep = 3;
+            emitUIUpdata("voiceStep = 3");
         }
-        else if(str == "不确认"){
+        else if(str == "不确定"){
+            emitUIUpdata("<font color = green>请重新选择你喜欢动物娃娃</font>");
             voice->textToSoundPlay("请重新选择你喜欢动物娃娃");
             voiceStep = 1;
+            emitUIUpdata("voiceStep = 1");
         }
         break;
-        stepFlag = true;
+        //stepFlag = true;
         voiceStepReset();
     case 3:
         stepFlag = false;
-        if(objType == BEAR){
-            setReturnStrtoUI("抓取：<font color = blue size = 10> 小熊 </font>" );
-            voice->textToSoundPlay("正在为您抓取小熊");
-            selectObjCombobox(0);
-            stepFlag = true;
+        if(str == "确认")
+        {
+            if(objType == BEAR){
+                emitUIUpdata("抓取：<font color = blue size = 10> 小熊 </font>" );
+                emitUIUpdata("<font color = green>正在为您抓取小熊</font>");
+                voice->textToSoundPlay("正在为您抓取小熊");
+                selectObjCombobox(0);
+                //stepFlag = true;
+                voiceStepReset();
+            }
+            else if(objType == RABBIT){
+                setReturnStrtoUI("抓取：<font color = blue size = 10> 小兔子 </font>" );
+                emitUIUpdata("<font color = green>正在为您抓取小兔子</font>");
+                voice->textToSoundPlay("正在为您抓取小兔子");
+                selectObjCombobox(1);
+            }
+            else if(objType == GIRAFFE){
+                setReturnStrtoUI("抓取：<font color = blue size = 10> 长颈鹿 </font>" );
+                emitUIUpdata("<font color = green>正在为您抓取长颈鹿</font>");
+                voice->textToSoundPlay("正在为您抓取长颈鹿");
+                selectObjCombobox(2);
+            }
+            else{
+                return;
+            }
+            voice->stopVoiceRecognition();
+            voiceState = 2;
+            startMove();
+            voiceStep = 0;
+            emitUIUpdata("voiceStep = 0");
+            //stepFlag = true;
             voiceStepReset();
         }
-        else if(objType == RABBIT){
-            setReturnStrtoUI("抓取：<font color = blue size = 10> 小兔子 </font>" );
-            voice->textToSoundPlay("正在为您抓取小熊");
-            selectObjCombobox(1);
+        else if(str == "不确定")
+        {
+            emitUIUpdata("<font color = green>请重新选择你喜欢动物娃娃</font>");
+            voice->textToSoundPlay("请重新选择你喜欢动物娃娃");
+            voiceStep = 1;
+            emitUIUpdata("voiceStep = 1");
         }
-        else if(objType == GIRAFFE){
-            setReturnStrtoUI("抓取：<font color = blue size = 10> 长颈鹿 </font>" );
-            voice->textToSoundPlay("正在为您抓取小熊");
-            selectObjCombobox(2);
-        }
-        else{
-            return;
-        }
-        voice->stopVoiceRecognition();
-        voiceState = 2;
-        startMove();
-        voiceStep = 0;
-        stepFlag = true;
-        voiceStepReset();
         break;
     default:
         voiceStep = 0;
@@ -289,7 +320,7 @@ void MainWindow::readRobotConfig()
                 ui->lineEdit_rip->setReadOnly(true);
                 ui->lineEdit_rport->setReadOnly(true);
                 sleep(1);
-                initRobot();
+                //initRobot();
                 hscThredflat = true;
                 getHscLocDataStart();
                 setReturnStrtoUI("<font color = green> 连接机器人成功！！！</font>");
@@ -305,6 +336,7 @@ void MainWindow::readRobotConfig()
     return;
 }
 
+/*
 void MainWindow::initRobot()
 {
     bool en;
@@ -340,6 +372,7 @@ void MainWindow::initRobot()
         }
     }
 }
+*/
 
 void MainWindow::connectHsRobotBnt()
 {
@@ -357,16 +390,17 @@ void MainWindow::connectHsRobotBnt()
             ui->lineEdit_rport->setReadOnly(true);
             getHscMsgTimer->start(100);
             sleep(1);
-            initRobot();
+            hscMsgThrdFlag = true;
             hscThredflat = true;
             getHscLocDataStart();
-            setReturnStrtoUI("<font color = green> 连接机器人成功！！！</font>");
+            getHscMsgThrd();
+            emitUIUpdata("<font color = green> 连接机器人成功！！！</font>");
          }
          else
          {
             ui->lineEdit_rip->setReadOnly(false);
             ui->lineEdit_rport->setReadOnly(false);
-            setReturnStrtoUI("<font color = red> 连接机器人失败！！！ </font>");
+            emitUIUpdata("<font color = red> 连接机器人失败！！！ </font>");
          }
     }
    else
@@ -379,18 +413,20 @@ void MainWindow::connectHsRobotBnt()
             ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(２55, 255, 255)");
             getHscMsgTimer->stop();
             hscThredflat = false;
-            setReturnStrtoUI("<font color = green> 断开连接机器人成功！！！</font>");
+            hscMsgThrdFlag = false;
+            emitUIUpdata("<font color = green> 断开连接机器人成功！！！</font>");
         }
         else
         {
            ui->lineEdit_rip->setReadOnly(true);
            ui->lineEdit_rport->setReadOnly(true);
-           setReturnStrtoUI("<font color = red> 断开连接机器人失败！！！ </font>");
+           emitUIUpdata("<font color = red> 断开连接机器人失败！！！ </font>");
         }
     }
     return;
 }
 
+/*
 void MainWindow::enanleHsRobotBnt()
 {
     if(ui->pushButton_ebnable->text() == "使能")
@@ -454,31 +490,64 @@ void MainWindow::loadHSRobotPrgBnt()
     }
     return;
 }
+*/
 
 void MainWindow::HsRobotStartBnt()
 {
     if(ui->pushButton_start->text() == "开始" )
     {
+        hsc3->setHscMode(OP_AUT);
+        hsc3->setHscVord(20);
+        if(hsc3->HscLoadPRG(progName) && HscStatus){
+            emitUIUpdata("<font color = green> 机器人加载程序成功！！！</font>");
+        }
+        else{
+            emitUIUpdata("<font color = red> 机器人加载程序失败！！！ </font>");
+            return;
+        }
+
+        if(hsc3->setHscEnanle(true) && HscStatus){
+            emitUIUpdata("<font color = green> 机器人使能成功！！！</font>");
+        }
+        else{
+            emitUIUpdata("<font color = red> 机器人使能失败！！！ </font>");
+            return;
+        }
+        sleep(1.0);
         if(hsc3->HscPrgStart(progName) && HscStatus){
             ui->pushButton_start->setText("停止");
             ui->pushButton_start->setStyleSheet("background-color: rgb(85, 255, 127)");
-            setReturnStrtoUI("<font color = green> 开始运行机器人程序成功！！！</font>");
+            emitUIUpdata("<font color = green> 开始运行机器人程序成功！！！</font>");
         }
         else
         {
-            setReturnStrtoUI("<font color = red> 开始运行机器人程序失败！！！ </font>");
+            emitUIUpdata("<font color = red> 开始运行机器人程序失败！！！ </font>");
+            return;
         }
     }
     else
     {
+        if(hsc3->HscUnloadPRG(progName)){
+            emitUIUpdata("<font color = green> 机器人卸载程序成功！！！</font>");
+        }
+        else{
+            setReturnStrtoUI("<font color = red> 机器人卸载程序失败！！！ </font>");
+        }
+
+        if(hsc3->setHscEnanle(false)){
+            emitUIUpdata("<font color = green> 机器人失能成功！！！<font>");
+        }
+        else{
+            emitUIUpdata("<font color = red> 机器人使能失败！！！ </font>");
+        }
+        sleep(1.0);
         if(hsc3->HscPrgStop(progName)){
             ui->pushButton_start->setText("开始");
             ui->pushButton_start->setStyleSheet("background-color: rgb(255, 255, 255)");
-            setReturnStrtoUI("<font color = green> 停止运行机器人程序成功！！！</font>");
+            emitUIUpdata("<font color = green> 停止运行机器人程序成功！！！</font>");
         }
-        else
-        {
-            setReturnStrtoUI("<font color = red> 停止运行机器人程序失败！！！ </font>");
+        else{
+            emitUIUpdata("<font color = red> 停止运行机器人程序失败！！！ </font>");
         }
     }
     return;
@@ -519,6 +588,8 @@ void MainWindow::getHscLocDataStart()
 {
     boost::function0<void > f = boost::bind(&MainWindow::getHscLocThrd, this);
     HscLocThrd = new boost::thread(f);
+    delete HscLocThrd;
+    return;
 }
 
 void MainWindow::showHsrLocData(LocData data)
@@ -555,32 +626,42 @@ void MainWindow::getHscLocThrd()
     return;
 }
 
+void MainWindow::getHscMsgThrd()
+{
+    boost::function0<void > f = boost::bind(&MainWindow::HscMsgStatusLET, this);
+    hscMsgThrd = new boost::thread(f);
+    delete hscMsgThrd;
+    return;
+}
+
 void MainWindow::HscMsgStatusLET()
 {
     ErrLevel level;
     std::string msg;
     QString qstr;
 
-    if(!hsc3->getFaultMessage(level,msg))
-    {
-        //setReturnStrtoUI("<font color = red> 获取机器人报警！！！ </font>");
-        return;
-    }
-    qstr = QString::fromStdString(msg);
-    if(level == ERR_LEVEL_ERROR || level == ERR_LEVEL_FATAL)
-    {
-        HscStatus = false;
-        ui->lineEdit_Msg->setStyleSheet("background-color: rgb(255, 85, 0);");
+    while(hscMsgThrdFlag){
 
-        setReturnStrtoUI("<font color = red>" + qstr + "</font>");
-    }
-    else if(level == ERR_LEVEL_WARNING)
-    {
-        setReturnStrtoUI("<font color = yellow>" + qstr + "</font>");
-    }
-    else
-    {
-        setReturnStrtoUI("<font color = black>" + qstr + "</font>");
+        if(!hsc3->getFaultMessage(level,msg)){
+            emitUIUpdata("<font color = red> 获取机器人报警失败！！！ </font>");
+            continue;
+        }
+        qstr = QString::fromStdString(msg);
+        //if(msg == "")
+        //    return;
+        if(level == ERR_LEVEL_ERROR || level == ERR_LEVEL_FATAL){
+            HscStatus = false;
+            ui->lineEdit_Msg->setStyleSheet("background-color: rgb(255, 85, 0);");
+
+            emitUIUpdata("<font color = red>" + qstr + "</font>");
+        }
+        else if(level == ERR_LEVEL_WARNING){
+            emitUIUpdata("<font color = yellow>" + qstr + "</font>");
+        }
+        else{
+            ;//emitUIUpdata("<font color = black>" + qstr + "</font>");
+        }
+        usleep(500000);
     }
 
     return;
@@ -590,10 +671,12 @@ void MainWindow::HscClearFaultBnt()
 {
     if(!hsc3->HscClearFault())
     {
-        setReturnStrtoUI("<font color = red> 机器人复位失败！！！ </font>");
+        emitUIUpdata("<font color = red> 机器人复位失败！！！ </font>");
         return;
     }
-    setReturnStrtoUI("<font color = green> 机器人复位成功！！！ </font>");
+    HscStatus = true;
+    ui->lineEdit_Msg->setStyleSheet("background-color: rgba(255, 255, 255, 80);");
+    emitUIUpdata("<font color = green> 机器人复位成功！！！ </font>");
     return;
 }
 
@@ -619,7 +702,7 @@ void MainWindow::showImageLabelChange(cv::Mat draw)
     ui->label_show_image->clear();
 
     LabelDisplayMat(ui->label_show_image,draw);
-
+    draw.release();
     return;
 }
 
@@ -679,6 +762,8 @@ void MainWindow::detesionBnt()
 {
     boost::function0<void > f = boost::bind(&MainWindow::detectionThread, this);
     thrd = new boost::thread(f);
+    delete thrd;
+    return;
 }
 
 void MainWindow::detectionThread()
@@ -872,7 +957,7 @@ void MainWindow::startMaulModeBnt()
 
 void MainWindow::selectObjCombobox(int index)
 {
-    cv::Mat selMat;
+    //cv::Mat selMat;
     switch (index) {
     case 0:
         objType = BEAR;
@@ -926,6 +1011,9 @@ void MainWindow::LabelDisplayMat(QLabel *label, cv::Mat mat)
 
     label->setPixmap(nimp);
 
+    Rgb.release();
+    mat.release();
+
     return;
 }
 
@@ -975,16 +1063,19 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     {
         if (event->type() == QEvent::MouseButtonDblClick)//当为双击事件时
         {
-            clikedcount++;
+            imgDialog->showMaximized();
+            //clikedcount++;
             if (clikedcount % 2 == 0) //此处为双击一次全屏，再双击一次退出
             {
-                ui->label_show_image->setWindowFlags(Qt::Dialog);
-                ui->label_show_image->showMaximized();//全屏显示
+                //ui->label_show_image->setWindowFlags(Qt::Dialog);
+                //ui->label_show_image->showMaximized();//全屏显示
+
             }
             else
             {
-                ui->label_show_image->setWindowFlags(Qt::SubWindow);
-                ui->label_show_image->showNormal();//退出全屏
+                //imgDialog->close();
+                //ui->label_show_image->setWindowFlags(Qt::SubWindow);
+                //ui->label_show_image->showNormal();//退出全屏
             };
 
         }
@@ -1141,6 +1232,8 @@ void MainWindow::voiceStepReset()
 {
     boost::function0 <void > f = boost::bind(&MainWindow::voiceSteoResetThrd, this);
     setpThrd = new boost::thread(f);
+    delete setpThrd;
+    return;
 }
 
 void MainWindow::voiceSteoResetThrd()
@@ -1155,4 +1248,10 @@ void MainWindow::voiceSteoResetThrd()
         stepFlag = false;
     }
     return;
+}
+
+void MainWindow::closeImageDialog()
+{
+    std::cout<<"revice revice"<<std::endl;
+    imgDialog->close();
 }

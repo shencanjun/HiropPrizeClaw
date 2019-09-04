@@ -83,10 +83,12 @@ private:
     boost::thread *moveThrd;
     boost::thread *HscLocThrd;
     boost::thread *setpThrd;
+    boost::thread *hscMsgThrd;
 
     int voiceState;
 
     bool hscThredflat;
+    bool hscMsgThrdFlag;
 
     int voiceStep;
 
@@ -132,7 +134,7 @@ public:
 
     void readRobotConfig();
 
-    void initRobot();
+    //void initRobot();
 
     void getRobotCom();
 
@@ -161,6 +163,8 @@ public:
     void showHsrLocData(LocData);
 
     void getHscLocThrd();
+
+    void getHscMsgThrd();
 
     void HscMsgStatusLET();
 
@@ -213,6 +217,8 @@ public:
     void voiceStepReset();
 
     void voiceSteoResetThrd();
+
+    void closeImageDialog();
 
 private:
     void closeEvent(QCloseEvent *event);

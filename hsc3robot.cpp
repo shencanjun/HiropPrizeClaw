@@ -126,9 +126,10 @@ bool HSC3ROBOT::getHscLoc(LocData &posData)
 bool HSC3ROBOT::getFaultMessage(ErrLevel &level, std::string &msg)
 {
     uint64_t code;
-    uint32_t time = 500;
+    uint32_t time = 100;
     ret = proSys->getMessage(level,code,msg,time);
-    return ret == 0 ? true : false;
+    std::cout<<"msg ret ="<<ret <<std::endl;
+    return (ret == 0 || ret == KM_ERR_NO_MESSAGE) ? true : false;
 }
 
 bool HSC3ROBOT::getHscProInfo(const std::string &fileName, ProgInfo &info)
