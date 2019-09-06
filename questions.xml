@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--问题设置-->
+<questions>
+
+    <question>请问本单元为您抓取娃娃的机器人属于什么类型的机器人？</question>
+    <answer>协作机器人</answer>
+　　　 <question>请问本单元为您抓取娃娃的机器人是几轴的机器人？</question>
+    <answer>六轴机器人</answer>
+　　　　<question>请问华数机器人最新的产品系列是哪个系列？</question>
+    <answer>BR双旋系列</answer>
+　　　　<question>请问我们公司的名字是什么？</question>
+    <answer>华数机器人</answer>
+
+</questions>
