@@ -128,19 +128,17 @@ bool HSC3ROBOT::getFaultMessage(ErrLevel &level, std::string &msg)
     uint64_t code;
     uint32_t time = 100;
     ret = proSys->getMessage(level,code,msg,time);
-    std::cout<<"msg ret ="<<ret <<std::endl;
     return (ret == 0 || ret == KM_ERR_NO_MESSAGE) ? true : false;
 }
 
 bool HSC3ROBOT::getHscProInfo(const std::string &fileName, ProgInfo &info)
 {
-    ret = proVm ->getProgInfo(fileName, info);
+    ret = proVm ->getProgInfo("HIROP.PRG", info);
     return ret == 0 ? true : false;
 }
 
 bool HSC3ROBOT::setHscVord(int vord)
 {
-    //ret = proMotion->setJogVord();
     ret = proMotion->setVord(vord);
     return ret == 0 ? true : false;
 }

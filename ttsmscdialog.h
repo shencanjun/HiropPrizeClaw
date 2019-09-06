@@ -5,6 +5,7 @@
 #include <ttsmsc.h>
 #include <qdebug.h>
 #include <QSound>
+#include <QSoundEffect>
 #include <QFileDialog>
 #include "voicerecognite.h"
 

@@ -56,7 +56,28 @@ void TtsMscDialog::textTtsMscBnt()
 
 void TtsMscDialog::SourcePlay()
 {
+//    QSoundEffect effect;
+//    qDebug()<<"ttsFileName : "<< ttsFileName;
+//    effect.setSource(QUrl::fromLocalFile("sound.wav"));
+//    //循环播放
+//    //effect.setLoopCount(QSoundEffect::Infinite);
+//    //设置音量，0-1
+//    effect.setVolume(0.25f);
+//    effect.play();
+    //std::cout<<"effect.isPlaying()"<<effect.isPlaying()<<std::endl;
+//    while(effect.isPlaying())
+//    {
+//        usleep(500000);
+//    }
+//    return;
+
+    QSound sound(ttsFileName);
     std::cout<<"正在播放"<<std::endl;
-    QSound::play(ttsFileName);
+    sound.play(ttsFileName);
+    std::cout<<"return"<<std::endl;
+//    while(sound.isFinished()){
+//        sleep(1.0);
+//    }
+//    std::cout<<"sleep5 sound.isFinished = "<<sound.isFinished()<<std::endl;
     return;
 }

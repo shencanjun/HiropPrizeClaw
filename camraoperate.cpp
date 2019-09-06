@@ -124,6 +124,8 @@ void CamraOperate::getObjectArray_callback(const vision_bridge::ObjectArray::Con
     vecBear.clear();
     vecRabbit.clear();
     vecGiraffe.clear();
+    vecDolphin.clear();
+    vecLeopard.clear();
     ImgMat = colorImg;
     if(msg->objects.size() <= 0){
         return;
@@ -158,6 +160,20 @@ void CamraOperate::getObjectArray_callback(const vision_bridge::ObjectArray::Con
                           ImgMat,AdetecImgFIle,cv::String("Giraffe"),
                           cv::Scalar(0,0,255));
         }
+        else if((static_cast<int >(msgPose.position.z)) == 4){
+            vecDolphin.push_back(msgPose);
+            opencvDrawing(msgPose.orientation.x,msgPose.orientation.y,
+                          msgPose.orientation.z,msgPose.orientation.w,
+                          ImgMat,AdetecImgFIle,cv::String("Dolphin"),
+                          cv::Scalar(255,0,255));
+        }
+        else if((static_cast<int >(msgPose.position.z)) == 5){
+            vecLeopard.push_back(msgPose);
+            opencvDrawing(msgPose.orientation.x,msgPose.orientation.y,
+                          msgPose.orientation.z,msgPose.orientation.w,
+                          ImgMat,AdetecImgFIle,cv::String("Leopard"),
+                          cv::Scalar(0,255,255));
+        }
         else{
             ;
         }
@@ -173,8 +189,15 @@ void CamraOperate::getObjectArray_callback(const vision_bridge::ObjectArray::Con
 //        std::cout<<"msgPose.orientation.w:"<<msgPose.orientation.w<<std::endl;
 
     }
+    std::vector<int> sizenum;
+    sizenum.push_back(vecBear.size());
+    sizenum.push_back(vecRabbit.size());
+    sizenum.push_back(vecGiraffe.size());
+    sizenum.push_back(vecDolphin.size());
+    sizenum.push_back(vecLeopard.size());
+
     sendImage(ImgMat);
-    send(have,vecBear.size(),vecRabbit.size(),vecGiraffe.size(), rcoRate);
+    send(have, sizenum, rcoRate);
     ImgMat.release();
     return;
 }

@@ -62,8 +62,8 @@ private:
     void getObjectArray_callback(const vision_bridge::ObjectArray::ConstPtr &msg);
 
 public:
-    void send(bool have,int numBear, int numRabbit, int numGiraffe,double rcoRate) const{
-        emit emitResultCam(have, numBear, numRabbit, numGiraffe ,rcoRate);
+    void send(bool have,std::vector<int> num,double rcoRate) const{
+        emit emitResultCam(have, num,rcoRate);
     }
 
     void sendImage(cv::Mat mat) const{
@@ -71,7 +71,7 @@ public:
     }
 
 signals:
-    void emitResultCam(bool, int , int , int, double) const;
+    void emitResultCam(bool, std::vector<int> , double) const;
     void emitImagesignal(cv::Mat) const;
 
 public:
@@ -84,6 +84,8 @@ public:
     std::vector< geometry_msgs::Pose > vecBear;
     std::vector< geometry_msgs::Pose > vecRabbit;
     std::vector< geometry_msgs::Pose > vecGiraffe;
+    std::vector< geometry_msgs::Pose > vecDolphin;
+    std::vector< geometry_msgs::Pose > vecLeopard;
 
 private:
     ros::NodeHandle n_camra;

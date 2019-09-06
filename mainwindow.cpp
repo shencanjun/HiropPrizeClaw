@@ -10,15 +10,16 @@ MainWindow::MainWindow(QWidget *parent) :
     //qRegisterMetaType<geometry_msgs::PoseStamped>("geometry_msgs::PoseStamped");
     qRegisterMetaType<cv::Mat>("cv::Mat");
     qRegisterMetaType<LocData>("LocData");
+    qRegisterMetaType<std::vector<int> >("std::vector<int> ");
 
    // MainXmlFile = "/home/fshs/HiropPrizeClaw/build-HiropPrizeClaw-unknown-Debug/MainConfig.xml";
 
     progName = "HIROP.PRG";
-    camImageFileName ="./show.jpg";
-    camADeteImgFile = "./Adetetion.jpg";
-    camSDeteImgFile = "./Sdetetion.jpg";
+    camImageFileName ="./data/show.jpg";
+    camADeteImgFile = "./data/Adetetion.jpg";
+    camSDeteImgFile = "./data/Sdetetion.jpg";
     camXmlFileName = "calibrate";
-    calibXmlName = "./calibrateData.xml";
+    calibXmlName = "./data/calibrateData.xml";
 
     objType = BEAR;
     voiceState = 0;
@@ -49,8 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     parse = new ParseConfig();
 
+    objList<<"小熊"<<"小兔子"<<"长颈鹿"<<"小海豚"<<"小豹子";
+
    // readMainXml();
-    getHscMsgTimer = new QTimer(this);
     showgroupTimer = new QTimer(this);
 
     ui->label_show_image->installEventFilter(this);
@@ -65,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, &MainWindow::emitCamPoseData, this, &MainWindow::showCamPose);
     connect(this, &MainWindow::emitsendImgData, imgDialog, &ImageDialog::reviceImg);
     connect(imgDialog, &ImageDialog::emitCloseSignal, this, &MainWindow::closeImageDialog);
+    connect(this, &MainWindow::emitsendsound, this, &MainWindow::soundsignal);
 
     connect(camOpera, &CamraOperate::emitImagesignal, imgDialog, &ImageDialog::reviceImg);
 
@@ -76,8 +79,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionSendProg, &QAction::triggered, this, &MainWindow::SendProgAction);
     connect(ui->pushButton_VoiceRecognition,&QPushButton::clicked,this,&MainWindow::OpenOrCloseVoiceRecognitionBnt);
     connect(ui->pushButton_connectRobot,&QPushButton::clicked,this,&MainWindow::connectHsRobotBnt);
-    //connect(ui->pushButton_ebnable,&QPushButton::clicked,this,&MainWindow::enanleHsRobotBnt);
-    //connect(ui->pushButton_Load,&QPushButton::clicked,this,&MainWindow::loadHSRobotPrgBnt);
     connect(ui->pushButton_start,&QPushButton::clicked,this,&MainWindow::HsRobotStartBnt);
     connect(ui->pushButton_result_set,&QPushButton::clicked,this,&MainWindow::setResultHsrLR);
     connect(ui->pushButton_clearFault, &QPushButton::clicked, this, &MainWindow::HscClearFaultBnt);
@@ -101,14 +102,13 @@ MainWindow::~MainWindow()
     hscMsgThrdFlag = false;
     hscThredflat = false;
     delete showgroupTimer;
-    delete getHscMsgTimer;
     delete camOpera;
-    delete imgDialog;
-    delete ttsDialog;
     delete hsc3;
     delete parse;
     delete voice;
-    delete calDialog;
+//    delete calDialog;
+//    delete imgDialog;
+//    delete ttsDialog;
     delete ui;
 }
 
@@ -201,99 +201,126 @@ void MainWindow::OpenOrCloseVoiceRecognitionBnt()
 
 void MainWindow::showVoiceRecognitionResult(QString str)
 {
+    if(str == "休眠"){
+        voiceStep = 0;
+    }
     switch (voiceStep) {
     case 0:
         if(str != "嘿华数")
             return;
-        voice->textToSoundPlay("你好！请选择你喜欢的动物娃娃，并告诉我...");
+        voice->textToSoundPlay("你好！欢迎来到华数机器人展馆，请选择你喜欢的动物娃娃，并告诉我...",
+                               "./data/tts_data/step0.wav");
+        camTakePirtureBnt();
+        //sendsound("./data/tts_data/step0.wav");
+        voiceSleep(6);
         voiceStep = 1;
-        //stepFlag = true;
-        emitUIUpdata("voiceStep = 1");
-        voiceStepReset();
         break;
     case 1:
         stepFlag = false;
-        if(str== "熊"){
+        if(str== objList[0]){
             objType = BEAR;
         }
-        else if(str == "兔"){
+        else if(str == objList[1]){
             objType = RABBIT;
         }
-        else if(str == "长颈鹿"){
+        else if(str == objList[2]){
             objType = GIRAFFE;
+        }
+        else if(str == objList[3]){
+            objType = DOLPHIN;
+        }
+        else if(str == objList[4]){
+            objType = LEOPARD;
         }
         else{
             break;
         }
-        voice->textToSoundPlay("你的选择为："+ str +"请您确认");
-        emitUIUpdata("<font color = green>你的选择为：</font> <font color = blue size = 10>"+ str +" </font> <font color = green size = 5> 请您确认</font>");
-        voiceStep = 2;
-        emitUIUpdata("voiceStep = 2");
-        //stepFlag = true;
-        voiceStepReset();
+        voice->textToSoundPlay("你的选择为："+ str +"请您确认","./data/tts_data/step1.wav");
+        //sendsound("./data/tts_data/step1.wav");
+        voiceSleep(3);
+
+        emitUIUpdata("<font color = green>你的选择为：</font> <font color = blue size = 10>"+ str +" </font> <font color = green size = 5> 请你确认</font>");
+        voiceStep = 3;
         break;
     case 2:
         stepFlag = false;
         if(str == "确认"){
-            emitUIUpdata("<font color = green>当前选择的娃娃为：</font> <font color = blue size = 10>"+ str +" </font> <font color = green size = 5>请再次确认</font>");
-            voice->textToSoundPlay("当前选择的娃娃为："+ str + "请再次确认");
+            emitUIUpdata("<font color = green>当前选择的娃娃为：</font> <font color = blue size = 10> 小兔子  </font> <font color = green size = 5>请你再次确认</font>");
+            //voice->textToSoundPlay("当前选择的娃娃为：小兔子 请再次确认","./data/tts_data/step2_y.wav");
+            voiceSleep(4);
             voiceStep = 3;
-            emitUIUpdata("voiceStep = 3");
         }
         else if(str == "不确定"){
             emitUIUpdata("<font color = green>请重新选择你喜欢动物娃娃</font>");
-            voice->textToSoundPlay("请重新选择你喜欢动物娃娃");
+            voice->textToSoundPlay("请重新选择你喜欢动物娃娃","./data/tts_data/step2_n.wav");
+            //sendsound("./data/tts_data/step2_n.wav");
+            voiceSleep(3);
             voiceStep = 1;
-            emitUIUpdata("voiceStep = 1");
         }
         break;
-        //stepFlag = true;
-        voiceStepReset();
     case 3:
         stepFlag = false;
         if(str == "确认")
         {
+            voice->stopVoiceRecognition();
             if(objType == BEAR){
                 emitUIUpdata("抓取：<font color = blue size = 10> 小熊 </font>" );
                 emitUIUpdata("<font color = green>正在为您抓取小熊</font>");
-                voice->textToSoundPlay("正在为您抓取小熊");
+               // voice->textToSoundPlay("正在为查找查找小熊","./data/tts_data/step3_b.wav");
+                //sendsound("./data/tts_data/step3_b.wav");
+                sleep(1.0);
                 selectObjCombobox(0);
-                //stepFlag = true;
-                voiceStepReset();
             }
             else if(objType == RABBIT){
                 setReturnStrtoUI("抓取：<font color = blue size = 10> 小兔子 </font>" );
                 emitUIUpdata("<font color = green>正在为您抓取小兔子</font>");
-                voice->textToSoundPlay("正在为您抓取小兔子");
+                //voice->textToSoundPlay("正在查找小兔子","./data/tts_data/step3_r.wav");
+                //sendsound("./data/tts_data/step3_r.wav");
+                sleep(1.0);
                 selectObjCombobox(1);
             }
             else if(objType == GIRAFFE){
                 setReturnStrtoUI("抓取：<font color = blue size = 10> 长颈鹿 </font>" );
                 emitUIUpdata("<font color = green>正在为您抓取长颈鹿</font>");
-                voice->textToSoundPlay("正在为您抓取长颈鹿");
+                //voice->textToSoundPlay("正在查找长颈鹿","./data/tts_data/step3_g.wav");
+                //sendsound("./data/tts_data/step3_g.wav");
+                sleep(1.0);
                 selectObjCombobox(2);
+            }
+            else if(objType == DOLPHIN){
+                setReturnStrtoUI("抓取：<font color = blue size = 10> 小海豚 </font>" );
+                emitUIUpdata("<font color = green>正在为您抓取小海豚</font>");
+                //voice->textToSoundPlay("正在查找小海豚","./data/tts_data/step3_d.wav");
+                //sendsound("./data/tts_data/step3_g.wav");
+                sleep(1.0);
+                selectObjCombobox(3);
+            }
+            else if(objType == LEOPARD){
+                setReturnStrtoUI("抓取：<font color = blue size = 10> 小豹子 </font>" );
+                emitUIUpdata("<font color = green>正在为您抓取小豹子</font>");
+                //voice->textToSoundPlay("正在查找小豹子","./data/tts_data/step3_l.wav");
+                //sendsound("./data/tts_data/step3_l.wav");
+                sleep(1.0);
+                selectObjCombobox(4);
             }
             else{
                 return;
             }
-            voice->stopVoiceRecognition();
             voiceState = 2;
             startMove();
             voiceStep = 0;
-            emitUIUpdata("voiceStep = 0");
-            //stepFlag = true;
-            voiceStepReset();
         }
-        else if(str == "不确定")
+        else if(str == "不确认")
         {
             emitUIUpdata("<font color = green>请重新选择你喜欢动物娃娃</font>");
-            voice->textToSoundPlay("请重新选择你喜欢动物娃娃");
+            //voice->textToSoundPlay("请重新选择你喜欢动物娃娃","./data/tts_data/step3_n.wav");
+            sendsound("./data/tts_data/step3_n.wav");
             voiceStep = 1;
-            emitUIUpdata("voiceStep = 1");
+            //emitUIUpdata("voiceStep = 1");
         }
         break;
     default:
-        voiceStep = 0;
+        //voiceStep = 0;
         break;
     }
     return;
@@ -336,10 +363,10 @@ void MainWindow::readRobotConfig()
     return;
 }
 
-/*
+
 void MainWindow::initRobot()
 {
-    bool en;
+    bool en = false;
 
     if(!HscStatus)
     {
@@ -348,31 +375,24 @@ void MainWindow::initRobot()
     if(hsc3->getHscEnanle(en))
     {
         if(en){
-            ui->pushButton_ebnable->setText("失能");
-            ui->pushButton_ebnable->setStyleSheet("background-color: rgb(85, 255, 127)");
-        }
-        else{
-            ui->pushButton_ebnable->setText("使能");
-            ui->pushButton_ebnable->setStyleSheet("background-color: rgb(255, 255, 255)");
-        }
-    }
-    const std::string fileName;
-    ProgInfo info;
-    if(hsc3->getHscProInfo(fileName, info))
-    {
-        if(info.state != AUTO_STATE_UNLOAD)
-        {
-            ui->pushButton_Load->setText("卸载");
-            ui->pushButton_Load->setStyleSheet("background-color: rgb(85, 255, 127)");
-        }
-        else if(info.state == AUTO_STATE_RUNNING)
-        {
             ui->pushButton_start->setText("停止");
             ui->pushButton_start->setStyleSheet("background-color: rgb(85, 255, 127)");
         }
     }
+
+    return;
+
+//    ProgInfo info;
+//    if(hsc3->getHscProInfo(progName, info))
+//    {
+//        if(info.state == AUTO_STATE_RUNNING)
+//        {
+//            ui->pushButton_start->setText("停止");
+//            ui->pushButton_start->setStyleSheet("background-color: rgb(85, 255, 127)");
+//        }
+//    }
 }
-*/
+
 
 void MainWindow::connectHsRobotBnt()
 {
@@ -388,8 +408,8 @@ void MainWindow::connectHsRobotBnt()
             ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(85, 255, 127)");
             ui->lineEdit_rip->setReadOnly(true);
             ui->lineEdit_rport->setReadOnly(true);
-            getHscMsgTimer->start(100);
             sleep(1);
+            initRobot();
             hscMsgThrdFlag = true;
             hscThredflat = true;
             getHscLocDataStart();
@@ -411,7 +431,6 @@ void MainWindow::connectHsRobotBnt()
             ui->lineEdit_rport->setReadOnly(false);
             ui->pushButton_connectRobot->setText("连接");
             ui->pushButton_connectRobot->setStyleSheet("background-color: rgb(２55, 255, 255)");
-            getHscMsgTimer->stop();
             hscThredflat = false;
             hscMsgThrdFlag = false;
             emitUIUpdata("<font color = green> 断开连接机器人成功！！！</font>");
@@ -497,7 +516,7 @@ void MainWindow::HsRobotStartBnt()
     if(ui->pushButton_start->text() == "开始" )
     {
         hsc3->setHscMode(OP_AUT);
-        hsc3->setHscVord(20);
+        hsc3->setHscVord(80);
         if(hsc3->HscLoadPRG(progName) && HscStatus){
             emitUIUpdata("<font color = green> 机器人加载程序成功！！！</font>");
         }
@@ -818,28 +837,61 @@ bool MainWindow::getCamPose(ObjType type)
     if(type == BEAR){
         if(camOpera->vecBear.size() <= 0){
             emitUIUpdata("<font color = red> 没有小熊了!!! </font>");
-            voice->textToSoundPlay("没有小熊了!");
+            //voice->textToSoundPlay("没有小熊了!","./data/tts_data/step_nb.wav");
+            sendsound("./data/tts_data/step_nb.wav");
             return false;
         }
+        //voice->textToSoundPlay("正在抓取小熊!","./data/tts_data/step_yb.wav");
+        sendsound("./data/tts_data/step_yb.wav");
         pose = camOpera->vecBear[0];
         std::cout<<"BEAR"<<std::endl;
     }
     else if(type == RABBIT){
         if(camOpera->vecRabbit.size() <= 0){
             emitUIUpdata("<font color = red> 没有小兔子了!!! </font>");
-            voice->textToSoundPlay("没有小兔子了!");
+            //voice->textToSoundPlay("没有小兔子了!","./data/tts_data/step_nr.wav");
+            sendsound("./data/tts_data/step_nr.wav");
             return false;
         }
+        //voice->textToSoundPlay("正在抓取小兔子!","./data/tts_data/step_yr.wav");
+        sendsound("./data/tts_data/step_yr.wav");
         pose = camOpera->vecRabbit[0];
         std::cout<<"RABBIT"<<std::endl;
     }
     else if(type == GIRAFFE){
         if(camOpera->vecGiraffe.size() <= 0){
             emitUIUpdata("<font color = red> 没有长颈鹿了!!! </font>");
-            voice->textToSoundPlay("没有长颈鹿了!");
+            //voice->textToSoundPlay("没有长颈鹿了!","./data/tts_data/step_ng.wav");
+            sendsound("./data/tts_data/step_ng.wav");
             return false;
         }
+        //voice->textToSoundPlay("正在抓取长颈鹿!","./data/tts_data/step_yg.wav");
+        sendsound("./data/tts_data/step_yg.wav");
         pose = camOpera->vecGiraffe[0];
+        std::cout<<"GIRAFFE"<<std::endl;
+    }
+    else if(type == DOLPHIN){
+        if(camOpera->vecDolphin.size() <= 0){
+            emitUIUpdata("<font color = red> 没有小海豚了!!! </font>");
+            //voice->textToSoundPlay("没有小海豚了!","./data/tts_data/step_nd.wav");
+            sendsound("./data/tts_data/step_nd.wav");
+            return false;
+        }
+        //voice->textToSoundPlay("正在抓取小海豚!","./data/tts_data/step_yd.wav");
+        sendsound("./data/tts_data/step_yd.wav");
+        pose = camOpera->vecDolphin[0];
+        std::cout<<"GIRAFFE"<<std::endl;
+    }
+    else if(type == LEOPARD){
+        if(camOpera->vecLeopard.size() <= 0){
+            emitUIUpdata("<font color = red> 没有小豹子了!!! </font>");
+            //voice->textToSoundPlay("没有小豹子了!","./data/tts_data/step_nl.wav");
+            sendsound("./data/tts_data/step_nl.wav");
+            return false;
+        }
+        //voice->textToSoundPlay("正在抓取小豹子!","./data/tts_data/step_yl.wav");
+        sendsound("./data/tts_data/step_yl.wav");
+        pose = camOpera->vecLeopard[0];
         std::cout<<"GIRAFFE"<<std::endl;
     }
     else {
@@ -861,6 +913,12 @@ bool MainWindow::getCamPose(ObjType type)
     //识别的相机坐标
     camX = (squareWidth / 2)+squareAX;
     camY = (squareHeigth / 2) + squareAY;
+    if(type == GIRAFFE){
+        camY = (squareHeigth / 2) + squareAY + 15;
+    }
+    if(type == LEOPARD){
+        camY = (squareHeigth / 2) + squareAY + 10;
+    }
 
     std::cout<<"camX:"<<camY<<std::endl;
     std::cout<<"camY:"<<camY<<std::endl;
@@ -896,7 +954,7 @@ void MainWindow::startMoveThrd()
     //识别
     detectionThread();
 
-    while(!haveObj && attemp <= 10){
+    while(!haveObj && attemp <= 1){
         usleep(300000);
         attemp++;
     }
@@ -918,7 +976,6 @@ void MainWindow::startMoveThrd()
     hsc3->setHscR(10,1);
     do{
         hsc3->getHscR(11,value);
-        std::cout<<"start_move"<<std::endl;
         sleep(1.0);
         ++attemp;
     }
@@ -936,10 +993,10 @@ void MainWindow::startMoveThrd()
     emitUIUpdata("<font color = green> 机器人已到位!!! </font>");
 
     emitUIUpdata("<font color = green> 识别成功，正在抓取!!! </font>");
-
+    voice->textToSoundPlay("识别成功，正在抓取!!!","./data/tts_data/step_pick.wav");
+    //sendsound("./data/tts_data/step_pick.wav");
     do{
         hsc3->getHscR(10,value);
-        std::cout<<"start_move"<<std::endl;
         sleep(1.0);
     }
     while(value == 1.0);
@@ -961,15 +1018,23 @@ void MainWindow::selectObjCombobox(int index)
     switch (index) {
     case 0:
         objType = BEAR;
-        setReturnStrtoUI("<font color = green > 选择小熊 </font>");
+        emitUIUpdata("<font color = green > 选择小熊 </font>");
         break;
     case 1:
         objType = RABBIT;
-        setReturnStrtoUI("<font color = green > 选择小兔子 </font>");
+        emitUIUpdata("<font color = green > 选择小兔子 </font>");
         break;
     case 2:
         objType = GIRAFFE;
-        setReturnStrtoUI("<font color = green > 选择长颈鹿 </font>");
+        emitUIUpdata("<font color = green > 选择长颈鹿 </font>");
+        break;
+    case 3:
+        objType = DOLPHIN;
+        emitUIUpdata("<font color = green > 选择小海豚 </font>");
+        break;
+    case 4:
+        objType = LEOPARD;
+        emitUIUpdata("<font color = green > 选择小豹子 </font>");
         break;
     default:
         objType = NONE;
@@ -1128,7 +1193,7 @@ void MainWindow::showDetectionRobotData(double rx, double ry)
     return;
 }
 
-void MainWindow::detectionDone(bool have, int numB, int numR, int numG, double rcoRate)
+void MainWindow::detectionDone(bool have, std::vector<int> num, double rcoRate)
 {
     if(!have){
         isdone = false;
@@ -1136,15 +1201,19 @@ void MainWindow::detectionDone(bool have, int numB, int numR, int numG, double r
         return;
     }
     QString strRate = QString::number(rcoRate,'f',4);
-    QString strB = QString::number(numB);
-    QString strR = QString::number(numR);
-    QString strG = QString::number(numG);
+    QString strB = QString::number(num[0]);
+    QString strR = QString::number(num[1]);
+    QString strG = QString::number(num[2]);
+    QString strD = QString::number(num[3]);
+    QString strL = QString::number(num[4]);
 
     emitUIUpdata("<font color = blue> 识别完成!!! </font>");
     emitUIUpdata("<font color = blue> 识别率："+strRate+" </font>");
     emitUIUpdata("<font color = blue> 小熊：　"+strB+" 个  </font>");
     emitUIUpdata("<font color = blue> 小兔子："+strR+" 个 </font>");
     emitUIUpdata("<font color = blue> 长颈鹿："+strG+" 个 </font>");
+    emitUIUpdata("<font color = blue> 小海豚："+strD+" 个 </font>");
+    emitUIUpdata("<font color = blue> 小豹子："+strL+" 个 </font>");
 
     isdone = true;
     return;
@@ -1254,4 +1323,38 @@ void MainWindow::closeImageDialog()
 {
     std::cout<<"revice revice"<<std::endl;
     imgDialog->close();
+    return;
+}
+
+
+void MainWindow::voiceSleep(int time)
+{
+    boost::function<void (int)> f = boost::bind(&MainWindow::voiceSleepThrd, this, -1);
+    vsThrd = new boost::thread(boost::bind(f,time));
+    delete vsThrd;
+    return;
+}
+
+void MainWindow::voiceSleepThrd(int time)
+{
+    voice->stopVoiceRecognition();
+    int i = 0;
+    while(i < time){
+        i++;
+        //usleep(1000000);
+        sleep(1);
+    }
+    std::cout<<"start"<<std::endl;
+    voice->startVoiceRecognition();
+}
+
+void MainWindow::soundsignal(QString fileName)
+{
+    QSound *sound = new QSound(fileName);
+    connect(this, SIGNAL(emitsendsoundThrd(void)), sound, SLOT(play(void)));
+    sendsoundThrd();
+    disconnect(this, SIGNAL(emitsendsoundThrd(void)), sound, SLOT(play(void)));
+    sound->fileName().clear();
+    //delete sound;
+    return;
 }

@@ -40,7 +40,6 @@ private:
     VoiceRecognite *voice;
     ParseConfig *parse;
     ros::NodeHandle n_MW;
-    QTimer *getHscMsgTimer;
     QTimer *showgroupTimer;
     QPixmap imp;
     QString MainXmlFile;
@@ -79,11 +78,14 @@ private:
 
     int clikedcount;
 
+    QStringList objList;
+
     boost::thread *thrd;
     boost::thread *moveThrd;
     boost::thread *HscLocThrd;
     boost::thread *setpThrd;
     boost::thread *hscMsgThrd;
+    boost::thread *vsThrd;
 
     int voiceState;
 
@@ -117,12 +119,22 @@ public:
         emit emitsendImgData(mat);
     }
 
+    void sendsoundThrd() const{
+        emit emitsendsoundThrd();
+    }
+
+    void sendsound(QString name) const{
+        emit emitsendsound(name);
+    }
+
 signals:
     void emitUIUpdata(QString str) const;
     void emitDetectionUIUpdata(double rx,double ry) const;
     void emitHscLocData(LocData) const;
     void emitCamPoseData(LocData) const;
     void emitsendImgData(cv::Mat) const;
+    void emitsendsoundThrd() const;
+    void emitsendsound(QString) const;
 
 public:
 
@@ -134,7 +146,7 @@ public:
 
     void readRobotConfig();
 
-    //void initRobot();
+    void initRobot();
 
     void getRobotCom();
 
@@ -198,7 +210,7 @@ public:
 
     void detectionThread();
 
-    void detectionDone(bool,int, int, int, double);
+    void detectionDone(bool,std::vector<int>, double);
 
     void showDetectionRobotData(double rx, double ry);
 
@@ -219,6 +231,12 @@ public:
     void voiceSteoResetThrd();
 
     void closeImageDialog();
+
+    void voiceSleep(int);
+
+    void voiceSleepThrd(int);
+
+    void soundsignal(QString);
 
 private:
     void closeEvent(QCloseEvent *event);

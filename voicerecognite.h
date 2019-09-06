@@ -16,6 +16,8 @@ enum ObjType{
     BEAR = 0,
     RABBIT = 1,
     GIRAFFE = 2,
+    DOLPHIN = 3,
+    LEOPARD = 4,
     NONE,
 };
 

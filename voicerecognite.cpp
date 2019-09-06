@@ -23,6 +23,11 @@ void VoiceRecognite::listenVoice_callback(const std_msgs::String::ConstPtr& msg)
 
    std::cout<<"msg.data:"<<intentFormMsgstr<<std::endl;
 
+   if(intentFormMsgstr == "wakeup")
+       send("嘿华数");
+   if(intentFormMsgstr == "sleep")
+       send("休眠");
+
    parseIntent(intentFormMsgstr);
    return;
 }
@@ -66,7 +71,6 @@ int VoiceRecognite::startVoiceRecognition()
     clientSatrtListener.call(startListen);
     if(startListen.response.reuslt == 0)
     {
-        msc->TtsLogin();
         std::cout<<"start listen succeeful!!!"<<std::endl;
     }
     else
@@ -82,7 +86,6 @@ int VoiceRecognite::stopVoiceRecognition()
     clientStopListener.call(stopListen);
     if(stopListen.response.reuslt == 0)
     {
-        msc->TtsLogout();
         std::cout<<"stop listen succeeful!!!"<<std::endl;
     }
     else
@@ -95,10 +98,11 @@ int VoiceRecognite::stopVoiceRecognition()
 int VoiceRecognite::textToSoundPlay(QString text, QString fileName)
 {
     int ret = -1;
-    ret = msc->TtsLogin();
+    msc->TtsLogin();
     std::string Stext = text.toStdString();
     std::string file = fileName.toStdString();
     ret = msc->textToSpeech(file,Stext);
+    msc->TtsLogout();
     std::cout<<"正在播放"<<std::endl;
     QSound::play(fileName);
     return 0;

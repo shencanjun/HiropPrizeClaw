@@ -565,6 +565,16 @@ QWidget:focus{outline: none;}</string>
                   <string>长颈鹿</string>
                  </property>
                 </item>
+                <item>
+                 <property name="text">
+                  <string>小海豚</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>小豹子</string>
+                 </property>
+                </item>
                </widget>
               </widget>
              </item>
