@@ -26,6 +26,18 @@ private:
 
     void SourcePlay();
 
+    void play();
+
+    qint64 getAudioTime(const QString &filePath);
+
+public:
+    void send(QString path) const{
+        emit emitSend(path);
+    }
+
+signals:
+    void emitSend(QString) const;
+
 private:
     Ui::TtsMscDialog *ui;
     QString ttsFileName;

@@ -11,6 +11,7 @@
 #include <ttsmsc.h>
 #include <qdebug.h>
 #include <QSound>
+#include <QFile>
 
 enum ObjType{
     BEAR = 0,
@@ -45,6 +46,7 @@ public:
     int startVoiceRecognition();
     int stopVoiceRecognition();
     int textToSoundPlay(QString text,QString fileName = "./sound.wav");
+    qint64 getAudioTime(const QString &filePath);
 
 public:
     Ttsmsc *msc;

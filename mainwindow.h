@@ -49,6 +49,7 @@ private:
     QString camXmlFileName;
     QString camADeteImgFile;
     QString camSDeteImgFile;
+    QString qesXmlFile;
 
     std::string progName;
     std::string robotIpStr;
@@ -86,13 +87,23 @@ private:
     boost::thread *setpThrd;
     boost::thread *hscMsgThrd;
     boost::thread *vsThrd;
+    boost::thread *voiceMoveThrd;
 
     int voiceState;
+    bool isVoiceSleep;
+    bool isVoiceOpen;
+    bool isTtsOpen;
+    bool isaskqes;
+
+    int anwserCount;
 
     bool hscThredflat;
     bool hscMsgThrdFlag;
 
     int voiceStep;
+
+    int qesNumber;
+    QString qesText,anwText;
 
 public:
     HSC3ROBOT *hsc3;
@@ -137,6 +148,8 @@ signals:
     void emitsendsound(QString) const;
 
 public:
+
+    void init();
 
     void readMainXml();
 
@@ -237,6 +250,14 @@ public:
     void voiceSleepThrd(int);
 
     void soundsignal(QString);
+
+    void PlaySound(QString text,bool open = true,QString fileName = "./data/sound.wav");
+
+    bool waitSoundPlay(bool is = true);
+
+    void voiceStartMove(QString str);
+
+    void voiceStartStrd(QString str);
 
 private:
     void closeEvent(QCloseEvent *event);

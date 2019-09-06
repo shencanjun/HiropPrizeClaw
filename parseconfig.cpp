@@ -50,11 +50,9 @@ bool ParseConfig::readMainXml(QString fileName,QString StartElementStr, QString 
     xmlMReader.setDevice(file);
     std::cout<<"-------------------"<<std::endl;
     if(xmlMReader.readNextStartElement()){
-        std::cout<<"11111111111111 ."<<std::endl;
         QString strName = xmlMReader.name().toString();
         if(strName == CONFIG)
         {
-            std::cout<<"22222222222."<<std::endl;
             Q_ASSERT(xmlMReader.isStartElement() && xmlMReader.name().toString() == CONFIG);
 
             if(xmlMReader.readNextStartElement()){
@@ -65,7 +63,6 @@ bool ParseConfig::readMainXml(QString fileName,QString StartElementStr, QString 
 
                     while (xmlMReader.readNextStartElement()) {
                         if (xmlMReader.name().toString() == ElementStr){
-                            std::cout<<"33333333333333 ."<<std::endl;
                             Q_ASSERT(xmlMReader.isStartElement() && xmlMReader.name().toString() == ElementStr);
 
                             conStr = xmlMReader.readElementText();
@@ -86,6 +83,7 @@ bool ParseConfig::readMainXml(QString fileName,QString StartElementStr, QString 
         std::cout<<"XML file format error."<<std::endl;
         xmlMReader.raiseError("XML file format error 22 .");
     }
+    file->close();
     delete file;
     return true;
 }
@@ -110,7 +108,7 @@ bool ParseConfig::readCalibXML(QString fileName, double &acc, double &comx, doub
     acc = acc_;
     comx = comx_;
     comy = comy_;
-
+    file->close();
     delete file;
     return !xmlReader.error();
 }
@@ -168,3 +166,59 @@ void ParseConfig::readComY()
     qDebug() << QString::fromLocal8Bit("COMY：%1").arg(strAuthor);
     return;
 }
+
+void ParseConfig::readQuestions(QString fileName, int &queNum)
+{
+    QFile *file = new QFile(fileName);
+    if (!file->open(QFile::ReadOnly | QFile::Text)) { // 只写模式打开文件
+        std::cout<<"open xml file faile!!!"<<std::endl;
+        return;
+    }
+    xmlQesReader.setDevice(file);
+    if(xmlQesReader.readNextStartElement()){
+        Q_ASSERT(xmlQesReader.isStartElement() && xmlQesReader.name().toString() == QUESTIONS);
+        while(xmlQesReader.readNextStartElement()){
+            QString str =xmlQesReader.name().toString();
+            if(str == QUESTION){
+                qesList << xmlQesReader.readElementText();
+            }
+            else if(str == ANSWER){
+                anwserList << xmlQesReader.readElementText();
+            }
+        }
+    }
+    for(int i= 0; i < qesList.size(); i++){
+        qDebug()<<"qesList:"<<qesList[i];
+        qDebug()<<"anwserList:"<<anwserList[i];
+    }
+    if(qesList.size() == anwserList.size()){
+        queNum = quesNum = qesList.size();
+    }
+    else {
+        queNum = quesNum = -1;
+    }
+    file->close();
+    delete file;
+    return;
+}
+
+void ParseConfig::resultQuestion(QString &qestion, QString &anwser)
+{
+    int index;
+    get_random_number(index);
+    if(quesNum < 0 || index >= quesNum)
+        return;
+    qestion = qesList[index];
+    anwser = anwserList[index];
+    return;
+}
+
+void ParseConfig::get_random_number(int &index)
+{
+    qDebug()<<"queNum:"<<quesNum;
+    qsrand(QTime(0,0,0,0).msecsTo(QTime::currentTime()));
+    index = qrand() % quesNum;//(quesNum -1);   //随机生成0到9的随机数
+    qDebug()<<"a:"<< index;
+}
+
+

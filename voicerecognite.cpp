@@ -103,8 +103,21 @@ int VoiceRecognite::textToSoundPlay(QString text, QString fileName)
     std::string file = fileName.toStdString();
     ret = msc->textToSpeech(file,Stext);
     msc->TtsLogout();
-    std::cout<<"正在播放"<<std::endl;
-    QSound::play(fileName);
+    //std::cout<<"正在播放"<<std::endl;
+    //QSound::play(fileName);
     return 0;
+}
+
+qint64 VoiceRecognite::getAudioTime(const QString &filePath)
+{
+    qDebug()<<"filePath:"<<filePath;
+    QFile file(filePath);
+    if (file.open(QIODevice::ReadOnly)) {
+        qint64 fileSize = file.size();
+        qint64 time = fileSize / (16000.0 * 2.0);
+        file.close();
+        return time;
+    }
+    return -1;
 }
 
