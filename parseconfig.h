@@ -21,6 +21,7 @@
 #define QUESTIONS "questions"
 #define QUESTION "question"
 #define ANSWER "answer"
+#define OPTIONS "options"
 
 class ParseConfig
 {
@@ -36,7 +37,7 @@ public:
 
     void readQuestions(QString fileName, int &queNum);
 
-    void resultQuestion(QString &qestion, QString &anwser);
+    void resultQuestion(QString &qestion,QString &option,QString &anwser, int &index);
 
     QString errorString() const;  // 错误信息
 
@@ -53,6 +54,7 @@ private:
     QXmlStreamWriter xmlWriter;
 
     QStringList qesList;
+    QStringList optiosList;
     QStringList anwserList;
 
     double acc_;

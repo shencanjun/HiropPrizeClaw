@@ -36,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(imgDialog, &ImageDialog::emitCloseSignal, this, &MainWindow::closeImageDialog);
     connect(this, &MainWindow::emitsendsound, this, &MainWindow::soundsignal);
     connect(ttsDialog, &TtsMscDialog::emitSend, this, &MainWindow::soundsignal);
+    connect(this, &MainWindow::emitQuestion, this, &MainWindow::showQuestion);
+    connect(this, &MainWindow::emitQuestion, imgDialog, &ImageDialog::showQuestion);
 
     connect(camOpera, &CamraOperate::emitImagesignal, imgDialog, &ImageDialog::reviceImg);
 
@@ -103,6 +105,7 @@ void MainWindow::init()
     haveObj = true;
     HscStatus = true;
     movestop = true;
+    anwserCount = 0;
     objList<<"小熊"<<"小兔子"<<"长颈鹿"<<"小海豚"<<"小豹子";
 
     calDialog->calibDataFileName = calibXmlName;
@@ -712,46 +715,46 @@ bool MainWindow::getCamPose(ObjType type)
     if(type == BEAR){
         if(camOpera->vecBear.size() <= 0){
             emitUIUpdata("<font color = red> 没有小熊了!!! </font>");
-            PlaySound("没有小熊了!",isTtsOpen,"./data/tts_data/step_nb.wav");
+            PlaySound("抱歉，没有小熊了!",isTtsOpen,"./data/tts_data/step_nb.wav",false);
             return false;
         }
-        PlaySound("正在抓取小熊!",isTtsOpen,"./data/tts_data/step_yb.wav");
+        PlaySound("识别成功,正在抓取小熊!",isTtsOpen,"./data/tts_data/step_yb.wav" ,false);
         pose = camOpera->vecBear[0];
     }
     else if(type == RABBIT){
         if(camOpera->vecRabbit.size() <= 0){
             emitUIUpdata("<font color = red> 没有小兔子了!!! </font>");
-            PlaySound("没有小兔子了!",isTtsOpen,"./data/tts_data/step_nr.wav");
+            PlaySound("抱歉，没有小兔子了!",isTtsOpen,"./data/tts_data/step_nr.wav",false);
             return false;
         }
-        PlaySound("正在抓取小兔子!",isTtsOpen,"./data/tts_data/step_yr.wav");
+        PlaySound("识别成功,正在抓取小兔子!",isTtsOpen,"./data/tts_data/step_yr.wav",false);
         pose = camOpera->vecRabbit[0];
     }
     else if(type == GIRAFFE){
         if(camOpera->vecGiraffe.size() <= 0){
             emitUIUpdata("<font color = red> 没有长颈鹿了!!! </font>");
-            PlaySound("没有长颈鹿了!",isTtsOpen,"./data/tts_data/step_ng.wav");
+            PlaySound("抱歉，没有长颈鹿了!",isTtsOpen,"./data/tts_data/step_ng.wav",false);
             return false;
         }
-        PlaySound("正在抓取长颈鹿!",isTtsOpen,"./data/tts_data/step_yg.wav");
+        PlaySound("识别成功,正在抓取长颈鹿!",isTtsOpen,"./data/tts_data/step_yg.wav",false);
         pose = camOpera->vecGiraffe[0];
     }
     else if(type == DOLPHIN){
         if(camOpera->vecDolphin.size() <= 0){
             emitUIUpdata("<font color = red> 没有小海豚了!!! </font>");
-            PlaySound("没有小海豚了!",isTtsOpen,"./data/tts_data/step_nd.wav");
+            PlaySound("抱歉，没有小海豚了!",isTtsOpen,"./data/tts_data/step_nd.wav",false);
             return false;
         }
-        PlaySound("正在抓取小海豚!",isTtsOpen,"./data/tts_data/step_yd.wav");
+        PlaySound("识别成功,正在抓取小海豚!",isTtsOpen,"./data/tts_data/step_yd.wav",false);
         pose = camOpera->vecDolphin[0];
     }
     else if(type == LEOPARD){
         if(camOpera->vecLeopard.size() <= 0){
             emitUIUpdata("<font color = red> 没有小豹子了!!! </font>");
-            PlaySound("没有小豹子了!",isTtsOpen,"./data/tts_data/step_nl.wav");
+            PlaySound("抱歉，没有小豹子了!",isTtsOpen,"./data/tts_data/step_nl.wav",false);
             return false;
         }
-        PlaySound("正在抓取小豹子!",isTtsOpen,"./data/tts_data/step_yl.wav");
+        PlaySound("识别成功,正在抓取小豹子!",isTtsOpen,"./data/tts_data/step_yl.wav",false);
         pose = camOpera->vecLeopard[0];
     }
     else {
@@ -777,7 +780,7 @@ bool MainWindow::getCamPose(ObjType type)
         camY = (squareHeigth / 2) + squareAY + 15;
     }
     if(type == LEOPARD){
-        camY = (squareHeigth / 2) + squareAY + 10;
+        camY = (squareHeigth / 2) + squareAY - 10;
     }
 
     std::cout<<"camX:"<<camY<<std::endl;
@@ -855,7 +858,7 @@ void MainWindow::startMoveThrd()
 
     emitUIUpdata("<font color = green> 机器人已到位!!! </font>");
     emitUIUpdata("<font color = green> 识别成功，正在抓取!!! </font>");
-    PlaySound("识别成功，正在抓取!!!",isTtsOpen,"./data/tts_data/step_pick.wav");
+    //PlaySound("识别成功，正在抓取!!!",isTtsOpen,"./data/tts_data/step_pick.wav");
     do{
         hsc3->getHscR(10,value);
         sleep(1.0);
@@ -1112,11 +1115,11 @@ bool MainWindow::getDetectionRobotPose()
 
 void MainWindow::voiceStatus()
 {
-    if(voiceState = 2){
-        voice->startVoiceRecognition();
-        voiceState = 1;
-        voiceStep = 0;
-    }
+//    if(voiceState = 2){
+//        voice->startVoiceRecognition();
+//        voiceState = 1;
+//        voiceStep = 0;
+//    }
     return;
 }
 
@@ -1199,17 +1202,17 @@ void MainWindow::voiceSleep(int time)
 
 void MainWindow::voiceSleepThrd(int tim)
 {
-    int time = tim+1;
-    if(voiceState != 3)
-        voice->stopVoiceRecognition();
+    int time = tim;
+    //if(voiceState != 3)
+     //   voice->stopVoiceRecognition();
     int i = 0;
     while(i < time){
         i++;
         std::cout<<"i:"<<i<<std::endl;
         sleep(1);
     }
-    if(voiceState != 3)
-        voice->startVoiceRecognition();
+    //if(voiceState != 3)
+     //   voice->startVoiceRecognition();
     isVoiceSleep = false;
     std::cout<<"true"<<std::endl;
     return;
@@ -1225,7 +1228,7 @@ void MainWindow::soundsignal(QString fileName)
     return;
 }
 
-void MainWindow::PlaySound(QString text, bool open, QString fileName)
+void MainWindow::PlaySound(QString text, bool open, QString fileName,bool wait)
 {
     if(isVoiceOpen){
         isVoiceSleep = true;
@@ -1236,7 +1239,8 @@ void MainWindow::PlaySound(QString text, bool open, QString fileName)
         qint64 time = voice->getAudioTime(fileName);
         int timet = static_cast<int>(time);
         voiceSleep(timet);
-        waitSoundPlay();
+        if(wait)
+            waitSoundPlay();
     }
     return;
 }
@@ -1265,78 +1269,105 @@ void MainWindow::voiceStartStrd(QString str)
         if(str != "嘿华数")
             return;
         if(isaskqes){
-            PlaySound("你好！欢迎来到华数机器人展馆，请回答下面的问题，回答成功后即可获得奖品哦！！！",isTtsOpen,
+            voice->stopVoiceRecognition();
+            PlaySound("你好！欢迎来到华数机器人展馆，请回答下面的问题，回答成功后即可获得奖品！！！",isTtsOpen,
                       "./data/tts_data/step0_0.wav");
-            PlaySound("请听好以下题目哦！！！",isTtsOpen,"./data/tts_data/step0_1.wav");
-            parse->resultQuestion(qesText,anwText);
-            PlaySound(qesText,true);
-            PlaySound("请回答！！！",isTtsOpen, "./data/tts_data/step0_2.wav");
+            usleep(500000);
+            PlaySound("请听好以下题目！！！",isTtsOpen,"./data/tts_data/step0_1.wav");
+
+            int index;
+            QString file;
+            parse->resultQuestion(qesText,optionText,anwText,index);
+            QString text = qesText +' \r\n '+optionText;
+            sendQuestion(text);
+            qDebug()<<"text:"<<text;
+            file = "./data/tts_data/step_Q" + QString::number(index)+".wav";
+            PlaySound(text,true,file);
+
             voiceStep = 1;
         }
         else{
+            camTakePirtureBnt();
             PlaySound("你好！欢迎来到华数机器人展馆，请选择你喜欢的动物娃娃并告诉我！！！！！！",isTtsOpen,
-                      "./data/tts_data/step0_3.wav");
+                      "./data/tts_data/step0_4.wav");
             voiceStep = 2;
         }
-
+        voice->startVoiceRecognition();
         break;
     case 1:
+        voice->stopVoiceRecognition();
         if(str != anwText){
-            PlaySound("回答错误，请重新回答！！！",isTtsOpen,"./data/tts_data/step1_１.wav");
+            emitUIUpdata("<font color = greed>你的答案为 </font> <font color = red size = 7>"+str+"</font>");
+            PlaySound("抱歉,回答错误，请重新回答！！！",isTtsOpen,"./data/tts_data/step1_１.wav");
             voiceStep = 1;
             anwserCount++;
+
             if(anwserCount >=3){
                 voiceStep = -1;
-                PlaySound("回答错误，回答次数已超三次！！！",isTtsOpen,"./data/tts_data/step1_２.wav");
+                anwserCount = 0;
+                PlaySound("回答次数已超三次，对不起！！！",isTtsOpen,"./data/tts_data/step1_２.wav");
             }
+            voice->startVoiceRecognition();
             return;
         }
         camTakePirtureBnt();
-        PlaySound("答案是"+anwText,true);
-        PlaySound("恭喜你回答正确，请选择你喜欢的动物娃娃！！！",isTtsOpen,"./data/tts_data/step1_３.wav");
+        //PlaySound("答案是"+anwText,true,"./data/tts_data/step1_3.wav");
+        PlaySound("恭喜你回答正确，请选择你喜欢的动物娃娃！！！",isTtsOpen,"./data/tts_data/step1_4.wav");
         voiceStep = 2;
+        voice->startVoiceRecognition();
         break;
     case 2:
         stepFlag = false;
+        voice->stopVoiceRecognition();
         if(str== objList[0]){
             objType = BEAR;
+            emitUIUpdata("<font color = green>你的选择为：</font> <font color = blue size = 10>"+ str +" </font> <font color = green size = 5> 请你确认</font>");
+            PlaySound("你的选择为：小熊 请您确认",isTtsOpen,"./data/tts_data/step2_b.wav");
         }
         else if(str == objList[1]){
             objType = RABBIT;
+            emitUIUpdata("<font color = green>你的选择为：</font> <font color = blue size = 10>"+ str +" </font> <font color = green size = 5> 请你确认</font>");
+            PlaySound("你的选择为：小兔子 请您确认",isTtsOpen,"./data/tts_data/step2_r.wav");
         }
         else if(str == objList[2]){
             objType = GIRAFFE;
+            emitUIUpdata("<font color = green>你的选择为：</font> <font color = blue size = 10>"+ str +" </font> <font color = green size = 5> 请你确认</font>");
+            PlaySound("你的选择为：长颈鹿 请您确认",isTtsOpen,"./data/tts_data/step2_g.wav");
         }
         else if(str == objList[3]){
             objType = DOLPHIN;
+            emitUIUpdata("<font color = green>你的选择为：</font> <font color = blue size = 10>"+ str +" </font> <font color = green size = 5> 请你确认</font>");
+            PlaySound("你的选择为：小海豚 请您确认",isTtsOpen,"./data/tts_data/step2_d.wav");
         }
         else if(str == objList[4]){
             objType = LEOPARD;
+            emitUIUpdata("<font color = green>你的选择为：</font> <font color = blue size = 10>"+ str +" </font> <font color = green size = 5> 请你确认</font>");
+            PlaySound("你的选择为：小豹子 请您确认",isTtsOpen,"./data/tts_data/step2_l.wav");
         }
         else{
             break;
         }
-        emitUIUpdata("<font color = green>你的选择为：</font> <font color = blue size = 10>"+ str +" </font> <font color = green size = 5> 请你确认</font>");
-        PlaySound("你的选择为："+ str +"请您确认",true);
+        voice->startVoiceRecognition();
         voiceStep = 4;
         break;
     case 3:
         stepFlag = false;
         if(str == "确认"){
             emitUIUpdata("<font color = green>当前选择的娃娃为：</font> <font color = blue size = 10> 小兔子  </font> <font color = green size = 5>请你再次确认</font>");
-            PlaySound("当前选择的娃娃为：小兔子 请再次确认","./data/tts_data/step3_y.wav");
+            PlaySound("当前选择的娃娃为：小兔子 请再次确认",isTtsOpen,"./data/tts_data/step3_y.wav");
             voiceSleep(4);
             voiceStep = 3;
         }
         else if(str == "不确定"){
             emitUIUpdata("<font color = green>请重新选择你喜欢动物娃娃</font>");
-            PlaySound("请重新选择你喜欢动物娃娃","./data/tts_data/step3_n.wav");
+            PlaySound("请重新选择你喜欢动物娃娃",isTtsOpen,"./data/tts_data/step3_n.wav");
             voiceSleep(3);
             voiceStep = 1;
         }
         break;
     case 4:
         stepFlag = false;
+        voice->stopVoiceRecognition();
         if(str == "确认")
         {
             voice->stopVoiceRecognition();
@@ -1344,7 +1375,7 @@ void MainWindow::voiceStartStrd(QString str)
             if(objType == BEAR){
                 emitUIUpdata("抓取：<font color = blue size = 10> 小熊 </font>" );
                 emitUIUpdata("<font color = green>正在为您抓取小熊</font>");
-                PlaySound("正在为查找查找小熊",isTtsOpen,"./data/tts_data/step4_b.wav");
+                PlaySound("正在查找小熊",isTtsOpen,"./data/tts_data/step4_b.wav");
                 selectObjCombobox(0);
             }
             else if(objType == RABBIT){
@@ -1375,6 +1406,7 @@ void MainWindow::voiceStartStrd(QString str)
                 return;
             }
             startMove();
+            std::cout<<"voiceStep:"<<voiceStep<<std::endl;
             voiceStep = 0;
         }
         else if(str == "不确认")
@@ -1383,10 +1415,18 @@ void MainWindow::voiceStartStrd(QString str)
             PlaySound("请重新选择你喜欢动物娃娃",isTtsOpen,"./data/tts_data/step4_n.wav");
             voiceStep = 2;
         }
+        voice->startVoiceRecognition();
         break;
     default:
         //voiceStep = 0;
         break;
     }
+    return;
+}
+
+void MainWindow::showQuestion(QString str)
+{
+    ui->label_show_image->setWordWrap(true);
+    ui->label_show_image->setText("<font color = red size = 7>" + str + "</font>");
     return;
 }

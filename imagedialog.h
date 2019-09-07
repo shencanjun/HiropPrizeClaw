@@ -27,6 +27,8 @@ public:
 
     void LabelDisplayMat(QLabel *label, cv::Mat mat);
 
+    void showQuestion(QString);
+
 public:
     void sendclose() const{
         emit emitCloseSignal();

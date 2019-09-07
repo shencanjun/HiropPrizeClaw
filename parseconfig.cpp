@@ -185,12 +185,15 @@ void ParseConfig::readQuestions(QString fileName, int &queNum)
             else if(str == ANSWER){
                 anwserList << xmlQesReader.readElementText();
             }
+            else if(str == OPTIONS){
+                optiosList << xmlQesReader.readElementText();
+            }
         }
     }
-    for(int i= 0; i < qesList.size(); i++){
-        qDebug()<<"qesList:"<<qesList[i];
-        qDebug()<<"anwserList:"<<anwserList[i];
-    }
+//    for(int i= 0; i < qesList.size(); i++){
+//        qDebug()<<"qesList:"<<qesList[i];
+//        qDebug()<<"anwserList:"<<anwserList[i];
+//    }
     if(qesList.size() == anwserList.size()){
         queNum = quesNum = qesList.size();
     }
@@ -202,14 +205,16 @@ void ParseConfig::readQuestions(QString fileName, int &queNum)
     return;
 }
 
-void ParseConfig::resultQuestion(QString &qestion, QString &anwser)
+void ParseConfig::resultQuestion(QString &qestion,QString &option, QString &anwser, int &ind)
 {
     int index;
     get_random_number(index);
     if(quesNum < 0 || index >= quesNum)
         return;
     qestion = qesList[index];
+    option = optiosList[index];
     anwser = anwserList[index];
+    ind = index;
     return;
 }
 

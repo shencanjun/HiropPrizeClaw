@@ -50,6 +50,13 @@ void ImageDialog::reviceImg(cv::Mat mat)
     return;
 }
 
+void ImageDialog::showQuestion(QString str)
+{
+    ui->label->setWordWrap(true);
+    ui->label->setText("<font color = red size = 20>" + str + "</font>");
+    return;
+}
+
 void ImageDialog::LabelDisplayMat(QLabel *label, cv::Mat mat)
 {
     cv::Mat Rgb;

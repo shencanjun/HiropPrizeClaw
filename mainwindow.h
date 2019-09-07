@@ -103,7 +103,7 @@ private:
     int voiceStep;
 
     int qesNumber;
-    QString qesText,anwText;
+    QString qesText,optionText,anwText;
 
 public:
     HSC3ROBOT *hsc3;
@@ -138,6 +138,10 @@ public:
         emit emitsendsound(name);
     }
 
+    void sendQuestion(QString str) const{
+        emit emitQuestion(str);
+    }
+
 signals:
     void emitUIUpdata(QString str) const;
     void emitDetectionUIUpdata(double rx,double ry) const;
@@ -146,6 +150,7 @@ signals:
     void emitsendImgData(cv::Mat) const;
     void emitsendsoundThrd() const;
     void emitsendsound(QString) const;
+    void emitQuestion(QString str) const;
 
 public:
 
@@ -251,13 +256,15 @@ public:
 
     void soundsignal(QString);
 
-    void PlaySound(QString text,bool open = true,QString fileName = "./data/sound.wav");
+    void PlaySound(QString text,bool open = true,QString fileName = "./data/sound.wav", bool wait = true);
 
     bool waitSoundPlay(bool is = true);
 
     void voiceStartMove(QString str);
 
     void voiceStartStrd(QString str);
+
+    void showQuestion(QString str);
 
 private:
     void closeEvent(QCloseEvent *event);
