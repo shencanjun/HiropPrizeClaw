@@ -95,6 +95,8 @@ private:
     bool isTtsOpen;
     bool isaskqes;
 
+    bool not_return;
+
     int anwserCount;
 
     bool hscThredflat;

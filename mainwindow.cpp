@@ -105,6 +105,7 @@ void MainWindow::init()
     haveObj = true;
     HscStatus = true;
     movestop = true;
+    not_return = false;
     anwserCount = 0;
     objList<<"小熊"<<"小兔子"<<"长颈鹿"<<"小海豚"<<"小豹子";
 
@@ -715,7 +716,7 @@ bool MainWindow::getCamPose(ObjType type)
     if(type == BEAR){
         if(camOpera->vecBear.size() <= 0){
             emitUIUpdata("<font color = red> 没有小熊了!!! </font>");
-            PlaySound("抱歉，没有小熊了!",isTtsOpen,"./data/tts_data/step_nb.wav",false);
+            PlaySound("抱歉，没有小熊了",isTtsOpen,"./data/tts_data/step_nb.wav",false);
             return false;
         }
         PlaySound("识别成功,正在抓取小熊!",isTtsOpen,"./data/tts_data/step_yb.wav" ,false);
@@ -1086,7 +1087,10 @@ void MainWindow::detectionDone(bool have, std::vector<int> num, double rcoRate)
 
 bool MainWindow::getDetectionRobotPose()
 {
+    not_return = false;
     if(!getCamPose(objType)){
+        not_return = true;
+        //voiceStep = 2;
         //haveObj = false;
         return false;
     }
@@ -1406,8 +1410,16 @@ void MainWindow::voiceStartStrd(QString str)
                 return;
             }
             startMove();
+            if(not_return){
+                emitUIUpdata("<font color = green>请重新选择你喜欢动物娃娃</font>");
+                PlaySound("请重新选择你喜欢动物娃娃",isTtsOpen,"./data/tts_data/step４_n.wav");
+                voiceStep = 2;
+                not_return = false;
+            }
+            else {
+                voiceStep = 0;
+            }
             std::cout<<"voiceStep:"<<voiceStep<<std::endl;
-            voiceStep = 0;
         }
         else if(str == "不确认")
         {
