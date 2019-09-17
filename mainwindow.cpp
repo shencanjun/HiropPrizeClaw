@@ -1234,13 +1234,15 @@ void MainWindow::soundsignal(QString fileName)
 
 void MainWindow::PlaySound(QString text, bool open, QString fileName,bool wait)
 {
+    qint64 time;
+    time = voice->getAudioTime(fileName);
     if(isVoiceOpen){
         isVoiceSleep = true;
-        if(open){
+        if(open && time >= 1){
             voice->textToSoundPlay(text,fileName);
         }
         sendsound(fileName);
-        qint64 time = voice->getAudioTime(fileName);
+        time = voice->getAudioTime(fileName);
         int timet = static_cast<int>(time);
         voiceSleep(timet);
         if(wait)
